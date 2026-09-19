@@ -2,1265 +2,2016 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مولّد الباركود الاحترافي لعيادة الأسنان</title>
-  <!-- Google Fonts: Cairo & Tajawal -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="pageBrowserTitle">حجز موعد - عيادة طب وجراحة الأسنان</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cairo -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- qr-code-styling for premium styled QR codes with embedded center icon -->
-  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
+  <!-- Firebase SDK (Compat Libraries for Web) -->
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            cairo: ['Cairo', 'sans-serif'],
-            tajawal: ['Tajawal', 'sans-serif'],
+            sans: ['Cairo', 'sans-serif'],
           },
           colors: {
-            dental: {
-              50: '#ecfeff',
-              100: '#cffafe',
-              200: '#a5f3fc',
-              300: '#67e8f9',
-              400: '#22d3ee',
-              500: '#06b6d4',
-              600: '#0891b2',
-              700: '#0e7490',
-              800: '#155e75',
-              900: '#164e63',
+            clinic: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              500: '#14b8a6',
+              600: '#0d9488',
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
             }
           }
         }
       }
     }
   </script>
+  
   <style>
     body {
-      font-family: 'Cairo', 'Tajawal', sans-serif;
-    }
-    .tooth-pattern {
+      font-family: 'Cairo', sans-serif;
       background-color: #f8fafc;
-      background-image: radial-gradient(#0891b2 0.75px, transparent 0.75px), radial-gradient(#06b6d4 0.75px, #f8fafc 0.75px);
-      background-size: 30px 30px;
-      background-position: 0 0, 15px 15px;
-      background-opacity: 0.05;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(207, 250, 254, 0.8);
+    
+    input, select, textarea {
+      font-size: 16px !important;
     }
-    .glow-cyan {
-      box-shadow: 0 10px 35px -5px rgba(6, 182, 212, 0.25);
+    @media (min-width: 640px) {
+      input, select, textarea {
+        font-size: 14px !important;
+      }
     }
-    @keyframes pulseSoft {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.03); opacity: 0.9; }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
     }
-    .pulse-soft {
-      animation: pulseSoft 3s ease-in-out infinite;
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+
+    @media print {
+      body {
+        background-color: white !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #0f172a !important;
+      }
+      
+      header, main, footer, .no-print, #doctorAuthModal, #clinicSettingsModal {
+        display: none !important;
+      }
+
+      #printablePdfReport {
+        display: block !important;
+        visibility: visible !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: white !important;
+        color: #0f172a !important;
+      }
+      
+      #printablePdfReport * {
+        visibility: visible !important;
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 12mm 14mm;
+      }
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen tooth-pattern antialiased selection:bg-cyan-500 selection:text-white">
+<body class="min-h-screen text-slate-800 flex flex-col justify-between select-none pb-12">
 
-  <header class="bg-gradient-to-r from-cyan-900 via-teal-800 to-cyan-900 text-white shadow-lg sticky top-0 z-50 border-b border-cyan-700/50">
-    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center p-2 backdrop-blur-md border border-white/20 shadow-inner">
-          <!-- Dental Tooth SVG Icon -->
-          <svg viewBox="0 0 24 24" class="w-full h-full fill-cyan-300" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
-          </svg>
+  <!-- Mobile-Optimized Top App Bar -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm no-print">
+    <div class="max-w-4xl mx-auto px-4 py-2.5 sm:py-3 flex items-center justify-between gap-3">
+      
+      <!-- Clinic Brand & Info -->
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-clinic-600 to-teal-400 text-white flex items-center justify-center shadow-md shadow-clinic-500/20 text-lg flex-shrink-0">
+          🦷
         </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
-            <span>نظام الباركود الطبي لعيادات الأسنان</span>
-            <span class="text-[10px] bg-cyan-500/30 text-cyan-200 px-2 py-0.5 rounded-full border border-cyan-400/40">هوية سنّية موحدة</span>
-          </h1>
-          <p class="text-xs text-cyan-200">تصميم كود استجابة موحّد بطابع الأسنان مخصص لغرفة الانتظار والمطبوعات الطبية</p>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5 truncate">
+            <h1 class="text-sm sm:text-base font-extrabold text-slate-900 truncate" id="navClinicTitle">عيادة طب وجراحة الأسنان</h1>
+            <span class="text-[9px] sm:text-[10px] bg-clinic-100 text-clinic-800 px-1.5 py-0.5 rounded-full font-bold flex-shrink-0" id="navDoctorGenderBadge">عيادة معتمدة</span>
+          </div>
+          <p class="text-[10px] sm:text-xs text-slate-500 flex items-center gap-1 font-medium truncate mt-0.5" id="navWorkingHoursSummary">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+            جاري مزامنة ساعات الدوام...
+          </p>
         </div>
       </div>
-      <div class="hidden sm:flex items-center gap-2 text-xs bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
-        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-        <span class="font-medium text-emerald-100">طابع أسنان احترافي 🦷</span>
+
+      <!-- Doctor Controls Toolbar -->
+      <div class="flex items-center gap-1.5 flex-shrink-0">
+        <div id="doctorAuthBar" class="hidden flex items-center gap-1 sm:gap-2">
+          <!-- System Push Notification Permissions -->
+          <button id="systemNotifBtn" onclick="requestSystemNotificationPermission()" title="تفعيل إشعارات النظام" 
+            class="p-2 text-slate-600 hover:text-clinic-600 bg-slate-100 rounded-xl transition-all text-xs flex items-center gap-1 cursor-pointer">
+            <span id="systemNotifIcon">🔔</span>
+            <span class="hidden md:inline text-[10px] font-bold">إشعارات النظام</span>
+          </button>
+
+          <!-- Audio Chime Toggle -->
+          <button id="soundToggleBtn" onclick="toggleSound()" title="تشغيل/كتم صوت الرنين" 
+            class="p-2 text-slate-600 hover:text-clinic-600 bg-slate-100 rounded-xl transition-all text-xs cursor-pointer">
+            <span id="soundIcon">🔊</span>
+          </button>
+
+          <!-- Exit Doctor Mode -->
+          <button onclick="handleDoctorLogout()" 
+            class="px-2.5 py-1.5 rounded-xl text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+            title="تسجيل خروج">
+            <span>🚪</span>
+            <span class="hidden sm:inline">خروج</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Doctor Sub-Tabs Navigation -->
+    <div id="doctorNavTabs" class="hidden border-t border-slate-100 bg-slate-50/80 px-4 py-1.5 no-print">
+      <div class="max-w-4xl mx-auto flex items-center justify-center gap-2">
+        <button id="tabDoctorLive" onclick="switchDoctorView('dashboard')" 
+          class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all bg-white text-clinic-700 shadow-sm border border-slate-200 text-center relative cursor-pointer">
+          حجوزات اليوم
+          <span id="navNotificationBadge" class="hidden absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+        </button>
+        <button id="tabDoctorAnalytics" onclick="switchDoctorView('analytics')" 
+          class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900 border border-transparent text-center cursor-pointer">
+          📊 الإحصائيات والـ PDF
+        </button>
+        <button onclick="openClinicSettingsModal()" 
+          class="flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900 border border-transparent text-center cursor-pointer">
+          ⚙️ الإعدادات
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    
-    <!-- Link Overview Banner -->
-    <div class="mb-8 p-4 sm:p-5 bg-gradient-to-l from-cyan-50 via-teal-50 to-white rounded-2xl border border-cyan-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-3 w-full md:w-auto">
-        <div id="bannerTypeIcon" class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md">
-          <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
+  <!-- Main Container -->
+  <main class="max-w-4xl mx-auto px-3.5 sm:px-6 py-4 w-full flex-grow no-print">
+
+    <!-- Capacity & Schedule Alert Card -->
+    <section class="mb-4 bg-gradient-to-l from-slate-900 via-clinic-900 to-slate-900 text-white p-4 sm:p-5 rounded-2xl shadow-lg relative overflow-hidden">
+      <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-clinic-500/20 rounded-full blur-2xl"></div>
+      
+      <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <!-- Status, Hours & Location -->
+        <div class="space-y-1.5 flex-1 min-w-0">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="bookingStatusPill" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              الحجز متاح الآن
+            </span>
+            <span class="text-[11px] text-slate-300 font-bold" id="bannerDoctorName">عيادة طب وجراحة الأسنان</span>
+          </div>
+
+          <!-- Custom Schedule Notes & Working Days -->
+          <div class="text-xs text-slate-200 leading-snug space-y-1">
+            <p class="text-teal-300 font-bold flex items-start sm:items-center gap-1.5">
+              <span class="flex-shrink-0">⏰</span>
+              <span id="bannerScheduleNotesText">جاري تحميل مواعيد وأوقات الدوام...</span>
+            </p>
+            <p class="text-[11px] text-slate-300 flex items-center gap-1.5">
+              <span>📅</span>
+              <span>أيام الدوام: <strong class="text-teal-300" id="bannerDays">السبت إلى الخميس</strong></span>
+            </p>
+            <!-- Clinic Location & Phone -->
+            <p class="text-[11px] text-slate-300 flex items-center gap-1.5 flex-wrap" id="bannerLocationPhoneRow">
+              <span>📍</span>
+              <span>الموقع: <strong class="text-teal-200 font-bold" id="bannerLocationText">المقر المعتمد للعيادة</strong></span>
+              <span class="text-slate-500">|</span>
+              <span>هاتف: <strong class="text-teal-200 font-bold" dir="ltr" id="bannerPhoneText">---</strong></span>
+            </p>
+          </div>
         </div>
-        <div class="overflow-hidden">
-          <span id="bannerTypeLabel" class="text-xs font-bold uppercase tracking-wider text-cyan-700 block">بيانات كود عيادة الأسنان</span>
-          <span id="urlDisplay" class="text-sm sm:text-base font-semibold text-slate-800 truncate block font-mono" dir="ltr">
-            https://nurse9sy-cyber.github.io/Doctor.S/
+
+        <!-- Seats Counter Box -->
+        <div id="seatsCounterContainer" class="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3 bg-white/10 px-3 py-2 rounded-xl border border-white/10 transition-all">
+          <div class="text-right">
+            <div class="text-[10px] text-slate-300">المقاعد المتبقية لليوم</div>
+            <div class="flex items-baseline gap-1">
+              <span id="remainingSeatsBadge" class="text-2xl font-black text-teal-300 leading-none">--</span>
+              <span class="text-[10px] text-slate-400">/ <span id="maxCapacityDisplay">--</span></span>
+            </div>
+          </div>
+          <div class="w-24 bg-slate-700/60 rounded-full h-2 overflow-hidden">
+            <div id="capacityProgressBar" class="bg-gradient-to-r from-emerald-400 to-teal-400 h-2 rounded-full transition-all duration-500" style="width: 100%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PATIENT VIEW -->
+    <section id="viewPatient" class="space-y-4 transition-all duration-300">
+      
+      <!-- Booking Form Card -->
+      <div class="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-sm">
+        <div class="border-b border-slate-100 pb-3 mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">حجز موعد طبي في العيادة</h2>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-0.5">يرجى إدخال البيانات لتثبيت الدور مباشرة في جدول الطبيب.</p>
+          </div>
+          <span class="text-[10px] font-bold px-2.5 py-1 bg-clinic-50 text-clinic-700 rounded-lg border border-clinic-200">
+            تأكيد لحظي
           </span>
         </div>
-      </div>
-      <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-        <button onclick="copyClinicData()" class="px-3 py-2 text-xs font-semibold text-cyan-800 bg-cyan-100 hover:bg-cyan-200 rounded-lg transition-colors flex items-center gap-1.5 active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-          <span id="btnCopyLabel">نسخ المحتوى</span>
-        </button>
-        <button id="btnActionTest" onclick="testQrAction()" class="px-3 py-2 text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-800 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-          <span id="btnActionLabel">معاينة الرابط</span>
-        </button>
-      </div>
-    </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      
-      <!-- Right/Main Column: Visual Display & High-Res Stand Card Preview -->
-      <div class="lg:col-span-6 flex flex-col items-center">
-        
-        <!-- Tab selector for preview mode -->
-        <div class="flex items-center gap-2 p-1.5 bg-slate-200/80 rounded-2xl mb-4 w-full max-w-md shadow-inner">
-          <button id="tabCardBtn" onclick="switchPreviewMode('card')" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all bg-white text-cyan-800 shadow-sm flex items-center justify-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            بطاقة العيادة الجاهزة للطباعة
-          </button>
-          <button id="tabQrBtn" onclick="switchPreviewMode('qr')" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
-            الباركود السنّي فقط (مستقل)
-          </button>
-        </div>
-
-        <div id="standCardContainer" class="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-cyan-100 transition-all duration-300 glow-cyan relative overflow-hidden text-center">
+        <form id="bookingForm" onsubmit="handlePatientBooking(event)" class="space-y-4">
           
-          <!-- Decorative Dental Clinic Top & Bottom Watermark Teeth -->
-          <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-100/60 rounded-full flex items-center justify-center pointer-events-none">
-            <svg class="w-16 h-16 fill-cyan-400/20" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
-          </div>
-          <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-100/60 rounded-full flex items-center justify-center pointer-events-none">
-            <svg class="w-16 h-16 fill-teal-400/20" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
-          </div>
-          
-          <!-- Clinic Header Badge -->
-          <div class="relative z-10 flex flex-col items-center mb-4">
-            <div id="cardEmblem" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-500 text-white flex items-center justify-center p-3 shadow-lg mb-3 border-2 border-white">
-              <div id="cardEmblemInner" class="w-full h-full flex items-center justify-center">
-                <!-- Injected Tooth Emblem -->
-              </div>
-            </div>
-            <h2 id="cardTitle" class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">عيادة د. سارة لطب وتجميل الأسنان</h2>
-            <p id="cardSubtitle" class="text-xs sm:text-sm text-cyan-700 font-semibold mt-1 flex items-center gap-1.5 justify-center">
-              <span>🦷</span>
-              <span id="cardSubtitleText">Dental & Aesthetic Clinic</span>
-              <span>✨</span>
-            </p>
-            <div class="w-20 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-2"></div>
-          </div>
+          <!-- Patient Classification -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">نوع الزيارة <span class="text-rose-500">*</span></label>
+            <div class="grid grid-cols-2 gap-2.5">
+              <label class="cursor-pointer">
+                <input type="radio" name="patientType" value="new" checked class="peer sr-only">
+                <div class="p-3 rounded-xl border-2 border-slate-200 text-center transition-all peer-checked:border-clinic-600 peer-checked:bg-clinic-50 peer-checked:text-clinic-800">
+                  <div class="font-bold text-xs sm:text-sm">مريض جديد</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">أول زيارة لفتح ملف</div>
+                </div>
+              </label>
 
-          <!-- QR Code Frame & Canvas Container -->
-          <div class="relative z-10 flex justify-center items-center my-4">
-            <div class="p-3.5 bg-gradient-to-tr from-cyan-50 to-slate-50 rounded-2xl border-2 border-cyan-200/90 shadow-md relative">
-              <!-- Small tooth corner markers -->
-              <span class="absolute top-1 right-1 text-[10px] opacity-40">🦷</span>
-              <span class="absolute bottom-1 left-1 text-[10px] opacity-40">🦷</span>
-              <div id="qrCodeDiv" class="flex justify-center items-center"></div>
+              <label class="cursor-pointer">
+                <input type="radio" name="patientType" value="followup" class="peer sr-only">
+                <div class="p-3 rounded-xl border-2 border-slate-200 text-center transition-all peer-checked:border-clinic-600 peer-checked:bg-clinic-50 peer-checked:text-clinic-800">
+                  <div class="font-bold text-xs sm:text-sm">مراجعة / متابعة</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">لديك ملف سابق ومتابعة علاج</div>
+                </div>
+              </label>
             </div>
           </div>
 
-          <!-- Scan instruction & Call to action -->
-          <div class="relative z-10 mt-3">
-            <div id="cardBadge" class="inline-flex items-center gap-1.5 bg-cyan-50 px-3.5 py-1.5 rounded-full border border-cyan-200 text-cyan-800 text-xs font-bold mb-2 shadow-xs">
-              <span id="cardBadgeIcon">🦷</span>
-              <span id="cardBadgeText">وجّه كاميرا هاتفك للمسح السريع</span>
+          <!-- Patient Name & Phone -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="patientName">
+                اسم المريض الثلاثي <span class="text-rose-500">*</span>
+              </label>
+              <input type="text" id="patientName" required placeholder="مثال: يوسف خالد النجار"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 focus:border-clinic-500 transition-all text-slate-900">
             </div>
-            <p id="cardActionText" class="text-xs text-slate-600 font-medium leading-relaxed">امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك</p>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="patientPhone">
+                رقم الهاتف للتأكيد <span class="text-rose-500">*</span>
+              </label>
+              <input type="tel" id="patientPhone" required placeholder="09XXXXXXXX" dir="ltr" inputmode="tel"
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 focus:border-clinic-500 transition-all text-slate-900 text-right">
+            </div>
+          </div>
+
+          <!-- Dental Services Selection Grid -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">الخدمة أو الإجراء المطلوب <span class="text-rose-500">*</span></label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="servicesGrid">
+              
+              <button type="button" onclick="selectDentalService('كشف وفحص ألم طارئ', this)"
+                class="service-card p-2.5 rounded-xl border-2 border-clinic-600 bg-clinic-50 text-clinic-800 text-right transition-all cursor-pointer">
+                <div class="text-base">🩺</div>
+                <div class="text-xs font-bold mt-0.5">كشف وفحص طارئ</div>
+                <div class="text-[9px] text-slate-500">تشخيص وتسكين الألم</div>
+              </button>
+
+              <button type="button" onclick="selectDentalService('علاج عصب وحشوات تجميلية', this)"
+                class="service-card p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-right transition-all cursor-pointer">
+                <div class="text-base">🦷</div>
+                <div class="text-xs font-bold mt-0.5">حشوات وعلاج عصب</div>
+                <div class="text-[9px] text-slate-500">سحب عصب وحشوة</div>
+              </button>
+
+              <button type="button" onclick="selectDentalService('تنظيف وتلميع وتبييض الأسنان', this)"
+                class="service-card p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-right transition-all cursor-pointer">
+                <div class="text-base">✨</div>
+                <div class="text-xs font-bold mt-0.5">تنظيف وتبييض</div>
+                <div class="text-[9px] text-slate-500">إزالة الجير والتبييض</div>
+              </button>
+
+              <button type="button" onclick="selectDentalService('تقويم الأسنان واستشارة', this)"
+                class="service-card p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-right transition-all cursor-pointer">
+                <div class="text-base">📐</div>
+                <div class="text-xs font-bold mt-0.5">تقويم الأسنان</div>
+                <div class="text-[9px] text-slate-500">استشارة أو جلسة شد</div>
+              </button>
+
+              <button type="button" onclick="selectDentalService('خلع وجراحة فموية', this)"
+                class="service-card p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-right transition-all cursor-pointer">
+                <div class="text-base">⚡</div>
+                <div class="text-xs font-bold mt-0.5">خلع وجراحة فموية</div>
+                <div class="text-[9px] text-slate-500">ضرس عقل أو قلع</div>
+              </button>
+
+              <button type="button" onclick="selectDentalService('زراعة وتركيبات وتلبيس (Zircon)', this)"
+                class="service-card p-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-right transition-all cursor-pointer">
+                <div class="text-base">👑</div>
+                <div class="text-xs font-bold mt-0.5">زراعة وتركيبات</div>
+                <div class="text-[9px] text-slate-500">تعويض الأسنان والزرع</div>
+              </button>
+
+            </div>
+            <input type="hidden" id="selectedServiceInput" value="كشف وفحص ألم طارئ" required>
+          </div>
+
+          <!-- Party Size & Dynamic Slots Selection -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             
-            <!-- Dedicated Wi-Fi Details Tag (shown when Wi-Fi is active) -->
-            <div id="wifiDetailsBadge" class="hidden mt-3 p-2.5 bg-cyan-50/70 rounded-xl text-xs text-slate-700 font-medium border border-cyan-200">
-              <div class="flex items-center justify-center gap-2 mb-1 text-cyan-900 font-bold">
-                <span>🦷📶</span>
-                <span>واي فاي صالة انتظار مرضى العيادة</span>
-              </div>
-              <div class="flex items-center justify-center gap-3 text-[11px]">
-                <span><strong class="text-cyan-800">الشبكة:</strong> <span id="cardWifiName" class="font-mono">Clinic_Guest</span></span>
-                <span>•</span>
-                <span><strong class="text-cyan-800">الرمز:</strong> <span id="cardWifiPass" class="font-mono bg-white px-1.5 py-0.5 rounded border border-cyan-200">Clinic@2026</span></span>
-              </div>
+            <!-- Number of Persons -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="partySizeSelect">
+                عدد المقاعد / الأشخاص <span class="text-rose-500">*</span>
+              </label>
+              <select id="partySizeSelect" onchange="handlePartySizeChange()"
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-clinic-500 text-xs font-bold">
+                <option value="1">شخص واحد (مريض واحد)</option>
+                <option value="2">شخصان (حجز مرافق/عائلي - مقعدان)</option>
+                <option value="3">3 أشخاص (حجز عائلي - 3 مقاعد)</option>
+                <option value="4">4 أشخاص (حجز عائلي - 4 مقاعد)</option>
+              </select>
+              <p id="partySizeAlert" class="text-[10px] text-slate-500 mt-1">يُحسم العدد فوراً من طاقة العيادة لليوم.</p>
             </div>
+
+            <!-- Dynamic Working Hours Slots -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1" for="timeSlotSelect">
+                الموعد المتاح ضمن ساعات دوام العيادة <span class="text-rose-500">*</span>
+              </label>
+              <select id="timeSlotSelect" required
+                class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-clinic-500 text-xs font-bold">
+              </select>
+              <p class="text-[10px] text-slate-500 mt-1">المواعيد تتولد آلياً استناداً لدوام العيادة.</p>
+            </div>
+
           </div>
 
-          <!-- Bottom Footer details in Card -->
-          <div class="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
-            <span id="cardSloganContainer" class="flex items-center gap-1.5 overflow-hidden">
-              <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0"></span>
-              <span id="cardSloganText" class="truncate">ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨</span>
-            </span>
-            <span class="font-mono text-cyan-800 font-semibold shrink-0 mr-auto" dir="ltr">Doctor.S Clinic</span>
+          <!-- Notes -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1" for="patientNotes">
+              ملاحظات أو وصف للألم (اختياري)
+            </label>
+            <textarea id="patientNotes" rows="2" placeholder="مثال: ألم مستمر بالجهة اليمنى السفلية..."
+              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 text-xs"></textarea>
           </div>
-        </div>
 
-        <!-- Standalone QR Code Direct View Container (Hidden initially) -->
-        <div id="qrOnlyContainer" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-xl border border-slate-200 flex flex-col items-center">
-          <div class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4">
-            <span class="text-base">🦷</span>
-            <span>الباركود السنّي المستقل بدقة نقية للطباعة</span>
-          </div>
-          <div id="qrStandaloneClone" class="p-4 bg-white rounded-2xl border-2 border-cyan-100 shadow-md"></div>
-          <p class="text-xs text-slate-500 mt-4 text-center">يمتلك الباركود هوية سنّية مدمجة في القلب، ويعمل على جميع هواتف الآيفون والأندرويد بدقة فائقة.</p>
-        </div>
-
-        <div class="w-full max-w-md mt-6 space-y-3">
-          <!-- Primary: High-Resolution Poster Card (PNG 2400x3200 Print-Ready) -->
-          <button onclick="downloadHighResPoster()" class="w-full py-3.5 px-5 bg-gradient-to-r from-cyan-700 via-teal-600 to-cyan-800 hover:from-cyan-800 hover:to-teal-900 text-white rounded-2xl font-bold shadow-lg shadow-cyan-700/30 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm sm:text-base">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-            </svg>
-            <span>تحميل بطاقة العيادة كاملة للطباعة (Ultra HD 300DPI)</span>
-          </button>
-
-          <!-- Secondary Row: Pure QR Image Downloads -->
-          <div class="grid grid-cols-2 gap-3">
-            <button onclick="downloadQrOnly('png')" class="py-2.5 px-4 bg-white hover:bg-cyan-50 border border-cyan-200 text-cyan-900 rounded-xl font-bold shadow-sm transition-all text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
-              <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>تحميل كود PNG (2000px)</span>
+          <!-- Submit Button -->
+          <div class="pt-1">
+            <button type="submit" id="submitBookingBtn"
+              class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-clinic-600 to-teal-500 hover:from-clinic-700 hover:to-teal-600 text-white font-bold text-sm shadow-md shadow-clinic-500/25 transition-all flex items-center justify-center gap-2 active:scale-[0.98] cursor-pointer">
+              <span>تأكيد الحجز فوراً</span>
+              <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </button>
-            <button onclick="downloadQrOnly('svg')" class="py-2.5 px-4 bg-white hover:bg-cyan-50 border border-cyan-200 text-cyan-900 rounded-xl font-bold shadow-sm transition-all text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
-              <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-              <span>تحميل فيكتور SVG دقيق</span>
-            </button>
+            <p class="text-center text-[10px] text-slate-400 mt-2">
+              🔒 تسجيل مباشر في جدول العيادة مع إشعار فوري لطاقم العيادة.
+            </p>
           </div>
-          
-          <p class="text-center text-[11px] text-slate-600">
-            🦷 الدقة المصدرة مصممة لتصلح للطباعة على لوحات الأكريليك وطاولات الانتظار بدون أي تشوش.
+
+        </form>
+      </div>
+
+    </section>
+
+    <!-- DOCTOR VIEW: LIVE DASHBOARD -->
+    <section id="viewDoctorDashboard" class="hidden space-y-4">
+      
+      <!-- Doctor Top Action Bar -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900" id="doctorDashboardTitle">
+              لوحة تحكم جدول العيادة اليومي
+            </h3>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-0.5">
+            الحساب النشط: <span id="doctorLoggedInEmail" class="font-bold text-clinic-700">dsa10company@gmail.com</span>
           </p>
         </div>
 
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <!-- Toggle Manual Lock -->
+          <button id="toggleLockBtn" onclick="toggleEmergencyLock()" 
+            class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 shadow-sm cursor-pointer">
+            <span id="lockIcon">🛑</span>
+            <span id="lockText">إيقاف الحجز مؤقتاً</span>
+          </button>
+
+          <!-- Reset Today -->
+          <button onclick="resetTodayAppointments()" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 rounded-xl transition-all cursor-pointer">
+            تصفير اليوم ↺
+          </button>
+        </div>
       </div>
 
-      <div class="lg:col-span-6 space-y-6">
+      <!-- Incoming Booking Alert Banner -->
+      <div id="doctorIncomingNotification" class="hidden bg-gradient-to-r from-teal-600 to-clinic-700 text-white p-3.5 rounded-2xl shadow-lg flex items-center justify-between gap-3 animate-pulse">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-lg flex-shrink-0">
+            🔔
+          </div>
+          <div class="truncate">
+            <div class="text-[10px] font-semibold text-teal-200">حجز جديد تم تأكيده للتو!</div>
+            <div id="latestNotificationText" class="text-xs font-bold truncate">حجز جديد</div>
+          </div>
+        </div>
+        <button onclick="dismissNotificationBanner()" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-white font-bold flex-shrink-0 cursor-pointer">
+          تم ✓
+        </button>
+      </div>
+
+      <!-- Metrics Row -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm text-center">
+          <div class="text-[10px] font-bold text-slate-400">إجمالي مرضى اليوم</div>
+          <div id="metricTotalPatients" class="text-xl font-black text-slate-800 mt-0.5">0</div>
+        </div>
+
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm text-center">
+          <div class="text-[10px] font-bold text-slate-400">مرضى جدد</div>
+          <div id="metricNewPatients" class="text-xl font-black text-clinic-600 mt-0.5">0</div>
+        </div>
+
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm text-center">
+          <div class="text-[10px] font-bold text-slate-400">مراجعات ومتابعة</div>
+          <div id="metricFollowupPatients" class="text-xl font-black text-amber-600 mt-0.5">0</div>
+        </div>
+
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm text-center">
+          <div class="text-[10px] font-bold text-slate-400">المقاعد الشاغرة</div>
+          <div id="metricSeatsLeft" class="text-xl font-black text-emerald-600 mt-0.5">--</div>
+        </div>
+      </div>
+
+      <!-- Today's Appointments Registry -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="p-3.5 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2 bg-slate-50/50">
+          <div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900">سجل حجوزات اليوم المتزامن</h4>
+            <span class="text-[10px] text-slate-400">تحديث لحظي مباشر</span>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex items-center gap-1 text-[11px]">
+            <button onclick="filterAppointmentsTable('all')" id="filterAllBtn" class="px-2.5 py-1 rounded-lg bg-clinic-600 text-white font-bold cursor-pointer">الكل</button>
+            <button onclick="filterAppointmentsTable('new')" id="filterNewBtn" class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-semibold cursor-pointer">جديد</button>
+            <button onclick="filterAppointmentsTable('followup')" id="filterFollowBtn" class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-semibold cursor-pointer">مراجعة</button>
+          </div>
+        </div>
+
+        <!-- Desktop Table -->
+        <div class="hidden sm:block overflow-x-auto custom-scrollbar">
+          <table class="w-full text-right text-xs">
+            <thead class="bg-slate-100/70 text-slate-600 font-bold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-3">#</th>
+                <th class="py-2.5 px-3">اسم المريض</th>
+                <th class="py-2.5 px-3">الهاتف</th>
+                <th class="py-2.5 px-3">النوع</th>
+                <th class="py-2.5 px-3">الخدمة المطلوبة</th>
+                <th class="py-2.5 px-3 text-center">المقاعد</th>
+                <th class="py-2.5 px-3">الموعد</th>
+                <th class="py-2.5 px-3 text-center">إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="appointmentsTableBody" class="divide-y divide-slate-100 text-slate-700">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Adaptive Cards List -->
+        <div id="appointmentsMobileList" class="sm:hidden divide-y divide-slate-100 p-2 space-y-2">
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyTableState" class="hidden p-8 text-center">
+          <div class="text-3xl mb-1">📋</div>
+          <div class="text-xs font-bold text-slate-700">لا توجد حجوزات مسجلة لليوم حتى الآن</div>
+          <p class="text-[10px] text-slate-400 mt-0.5">الحجوزات التي يقوم بها المرضى ستظهر هنا فوراً مع رنين جرس التنبيه.</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- DOCTOR VIEW: ANALYTICS & PDF -->
+    <section id="viewDoctorAnalytics" class="hidden space-y-4">
+      
+      <!-- Analytics Header -->
+      <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-1.5">
+              <span>📊</span>
+              <span>مركز الإحصائيات الشاملة والتقارير</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">تحليل فوري لحركة العيادة مع استخراج تقرير PDF رسمي.</p>
+          </div>
+
+          <!-- Timeframe selector -->
+          <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-bold self-start sm:self-auto">
+            <button onclick="setAnalyticsTimeframe('week')" id="timeframeWeekBtn" class="px-2.5 py-1 rounded-lg bg-white text-clinic-700 shadow-sm transition-all cursor-pointer">
+              الأسبوع
+            </button>
+            <button onclick="setAnalyticsTimeframe('month')" id="timeframeMonthBtn" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+              الشهر
+            </button>
+            <button onclick="setAnalyticsTimeframe('all')" id="timeframeAllBtn" class="px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+              الكل
+            </button>
+          </div>
+        </div>
+
+        <!-- Action buttons row -->
+        <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+          <button onclick="printOrExportPdfReport()" class="flex-1 sm:flex-none px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+            <span>🖨️ طباعة وحفظ تقرير PDF</span>
+          </button>
+          
+          <button onclick="exportAnalyticsCsv()" class="flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 transition-all flex items-center justify-center gap-1 cursor-pointer">
+            <span>📥 تصدير Excel/CSV</span>
+          </button>
+
+          <button onclick="loadAnalyticsDemoData()" class="px-3 py-2 rounded-xl text-xs font-bold border border-teal-200 bg-teal-50 text-teal-800 hover:bg-teal-100 transition-all cursor-pointer">
+            <span>⚡ تجربة بيانات</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Analytics Metrics -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="text-[10px] font-bold text-slate-400">إجمالي الحالات</div>
+          <div class="text-xl font-black text-slate-800 mt-1" id="analyticsTotalBookings">0</div>
+          <div class="text-[9px] text-slate-500 mt-0.5" id="analyticsAvgPerDay">0 حالة/يوم</div>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="text-[10px] font-bold text-slate-400">نسبة الجدد</div>
+          <div class="text-xl font-black text-emerald-600 mt-1" id="analyticsNewRatio">0%</div>
+          <div class="text-[9px] text-slate-500 mt-0.5" id="analyticsNewCount">0 مريض جديد</div>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="text-[10px] font-bold text-slate-400">نسبة المراجعات</div>
+          <div class="text-xl font-black text-amber-600 mt-1" id="analyticsFollowupRatio">0%</div>
+          <div class="text-[9px] text-slate-500 mt-0.5" id="analyticsFollowupCount">0 مراجعة</div>
+        </div>
+
+        <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="text-[10px] font-bold text-slate-400">معدل الإشغال</div>
+          <div class="text-xl font-black text-sky-600 mt-1" id="analyticsUtilizationRate">0%</div>
+          <div class="text-[9px] text-slate-500 mt-0.5">من الطاقة القصوى</div>
+        </div>
+      </div>
+
+      <!-- Charts Breakdown -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Services Distribution -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 class="text-xs font-bold text-slate-900">🦷 الخدمات الأكثر طلباً</h4>
+            <span class="text-[10px] text-slate-400 font-semibold" id="servicesChartTotalBadge">0 إجراء</span>
+          </div>
+          <div id="servicesBarsContainer" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Weekly Days Density -->
+        <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h4 class="text-xs font-bold text-slate-900">📅 توزيع أيام الأسبوع</h4>
+            <span class="text-[10px] text-slate-400 font-semibold">كثافة الحضور</span>
+          </div>
+          <div id="daysBarsContainer" class="space-y-2.5"></div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="mt-8 border-t border-slate-200/80 bg-white py-4 px-4 text-center no-print">
+    <div class="max-w-4xl mx-auto flex items-center justify-between text-[11px] text-slate-400">
+      <div>
+        جميع الحقوق محفوظة © <span id="footerClinicName">عيادة طب وجراحة الأسنان</span>
+      </div>
+      
+      <!-- زر تسجيل دخول الطبيب السري في أسفل الصفحة -->
+      <div id="footerDoctorAccessContainer">
+        <button id="footerDoctorLoginBtn" onclick="openDoctorAuthModal()" 
+          class="text-slate-400 hover:text-clinic-700 transition-all font-semibold flex items-center gap-1 cursor-pointer">
+          <span>🔒</span>
+          <span>بوابة إدارة العيادة</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PRINTABLE OFFICIAL MEDICAL REPORT -->
+  <div id="printablePdfReport" class="hidden">
+    <div style="border-bottom: 3px solid #0d9488; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: #0f766e; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+          🦷
+        </div>
+        <div>
+          <h1 style="font-size: 20px; font-weight: 900; color: #0f766e; margin: 0; line-height: 1.2;" id="pdfDoctorName">عيادة طب وجراحة الأسنان</h1>
+          <p style="font-size: 11px; font-weight: 700; color: #334155; margin: 2px 0;" id="pdfSpecialty">جراحة وزراعة وتجميل الأسنان</p>
+          <p style="font-size: 10px; color: #64748b; margin: 0;" id="pdfClinicInfo">المقر: المقر المعتمد | هاتف: ---</p>
+        </div>
+      </div>
+      
+      <div style="text-align: left; font-size: 10px; color: #334155; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 8px; background: #f8fafc;">
+        <div style="font-weight: 800; font-size: 12px; color: #0f766e; margin-bottom: 3px;">تقرير المواعيد والحجوزات الفردي</div>
+        <div>تاريخ الإصدار: <span style="font-weight: bold;" id="pdfPrintDate">--</span></div>
+        <div>نطاق التقرير: <span style="font-weight: bold; color: #0d9488;" id="pdfPeriodLabel">سجل اليوم</span></div>
+      </div>
+    </div>
+
+    <!-- KPIs Summary Cards -->
+    <div style="background-color: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
+      <div style="font-size: 11px; font-weight: 800; color: #1e293b; margin-bottom: 8px; display: flex; justify-content: space-between;">
+        <span>📊 ملخص المؤشرات الإنتاجية والتشغيلية (Operational KPIs)</span>
+        <span style="font-size: 10px; color: #64748b;">الطاقة اليومية: <strong id="pdfMaxCap" style="color: #0f766e;">15</strong> مريض</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center;">
+        <div style="background: white; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <div style="font-size: 9px; color: #64748b; font-weight: bold;">إجمالي الحالات</div>
+          <div style="font-size: 15px; font-weight: 900; color: #0f766e;" id="pdfTotalPatients">0</div>
+        </div>
+        <div style="background: white; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <div style="font-size: 9px; color: #64748b; font-weight: bold;">مرضى جدد</div>
+          <div style="font-size: 15px; font-weight: 900; color: #059669;" id="pdfNewPatients">0</div>
+        </div>
+        <div style="background: white; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <div style="font-size: 9px; color: #64748b; font-weight: bold;">جلسات مراجعة</div>
+          <div style="font-size: 15px; font-weight: 900; color: #d97706;" id="pdfFollowupPatients">0</div>
+        </div>
+        <div style="background: white; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <div style="font-size: 9px; color: #64748b; font-weight: bold;">إجمالي المقاعد المحجوزة</div>
+          <div style="font-size: 15px; font-weight: 900; color: #4338ca;" id="pdfBookedSeats">0</div>
+        </div>
+        <div style="background: white; padding: 6px; border-radius: 6px; border: 1px solid #cbd5e1;">
+          <div style="font-size: 9px; color: #64748b; font-weight: bold;">نسبة الإشغال اليومي</div>
+          <div style="font-size: 15px; font-weight: 900; color: #0284c7;" id="pdfUtilization">0%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patients Registry Table -->
+    <div style="margin-bottom: 14px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: right; border: 1.5px solid #cbd5e1;">
+        <thead>
+          <tr style="background-color: #0f766e; color: white; font-weight: bold;">
+            <th style="padding: 6px 4px; text-align: center; width: 25px; border: 1px solid #0d9488;">#</th>
+            <th style="padding: 6px 8px; border: 1px solid #0d9488;">اسم المريض</th>
+            <th style="padding: 6px 8px; border: 1px solid #0d9488;">الهاتف للتواصل</th>
+            <th style="padding: 6px 6px; text-align: center; border: 1px solid #0d9488;">نوع الزيارة</th>
+            <th style="padding: 6px 8px; border: 1px solid #0d9488;">الإجراء / الخدمة الطبية</th>
+            <th style="padding: 6px 6px; text-align: center; border: 1px solid #0d9488;">الموعد</th>
+            <th style="padding: 6px 4px; text-align: center; width: 35px; border: 1px solid #0d9488;">المقاعد</th>
+            <th style="padding: 6px 8px; border: 1px solid #0d9488;">ملاحظات / وصف الحالة</th>
+          </tr>
+        </thead>
+        <tbody id="pdfPatientsTableBody">
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Official Stamp & Signatures Box -->
+    <div style="margin-top: 24px; padding-top: 10px; border-top: 1.5px dashed #94a3b8; display: flex; justify-content: space-between; align-items: flex-end; font-size: 9.5px; color: #334155;">
+      <div>
+        <p style="margin: 0; font-weight: bold; color: #0f766e;">تقرير صادر ومعتمد من نظام إدارة عيادة الأسنان السحابي الموحد.</p>
+        <p style="margin: 3px 0 0 0; color: #64748b;">توقيع واستلام إدارة الاستقبال: ________________________________</p>
+      </div>
+      <div style="text-align: center; border: 1.5px dashed #0d9488; padding: 10px 24px; border-radius: 8px; color: #0f766e; font-weight: 800; background: #f0fdfa;">
+        ختم وتوقيع الطبيب المعتمد
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DOCTOR AUTHENTICATION & FORGOT PASSWORD -->
+  <div id="doctorAuthModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 rounded-2xl bg-clinic-100 text-clinic-700 flex items-center justify-center mx-auto text-xl font-black mb-2">
+          🔒
+        </div>
+        <h3 class="text-base font-bold text-slate-900" id="authModalHeaderTitle">بوابة إدارة العيادة</h3>
+        <p class="text-xs text-slate-500" id="authModalHeaderDesc">تسجيل الدخول بالبريد الإلكتروني للوصول إلى لوحة المواعيد.</p>
+      </div>
+
+      <!-- Tabs: Sign In / Register -->
+      <div id="authTabsContainer" class="flex bg-slate-100 p-1 rounded-xl text-xs font-bold">
+        <button id="authTabLogin" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg bg-white text-clinic-700 shadow-sm transition-all cursor-pointer">
+          تسجيل الدخول
+        </button>
+        <button id="authTabRegister" onclick="switchAuthTab('register')" class="flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer">
+          حساب جديد
+        </button>
+      </div>
+
+      <!-- Auth Form (Sign In / Register) -->
+      <form id="doctorAuthForm" onsubmit="handleDoctorAuthSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1" for="doctorAuthEmail">البريد الإلكتروني للطبيب</label>
+          <input type="email" id="doctorAuthEmail" required placeholder="dsa10company@gmail.com" dir="ltr"
+            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 font-semibold text-slate-800">
+        </div>
+
+        <!-- Password Field with Show/Hide Toggle -->
+        <div id="authPasswordGroup">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block font-bold text-slate-700" for="doctorAuthPassword">كلمة المرور</label>
+            <button type="button" onclick="showForgotPasswordPrompt()" class="text-[11px] text-clinic-600 hover:text-clinic-800 font-bold hover:underline cursor-pointer">
+              نسيت كلمة المرور؟
+            </button>
+          </div>
+          <div class="relative">
+            <input type="password" id="doctorAuthPassword" required minlength="6" placeholder="••••••••" dir="ltr"
+              class="w-full px-3 py-2.5 pl-14 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 font-semibold text-slate-800">
+            <button type="button" id="pwdToggleBtn" onclick="togglePasswordVisibility('doctorAuthPassword', this)"
+              class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-clinic-700 px-1.5 py-0.5 text-[10px] font-bold border border-slate-200 bg-slate-50 rounded-lg select-none transition-all cursor-pointer">
+              إظهار
+            </button>
+          </div>
+        </div>
+
+        <div id="authErrorMessage" class="hidden p-2.5 rounded-xl bg-rose-50 text-rose-700 text-[11px] font-bold border border-rose-200">
+          خطأ في المصادقة
+        </div>
+
+        <div id="authSuccessMessage" class="hidden p-2.5 rounded-xl bg-emerald-50 text-emerald-700 text-[11px] font-bold border border-emerald-200">
+          تمت العملية بنجاح
+        </div>
+
+        <div class="pt-1 flex gap-2">
+          <button type="submit" id="authSubmitBtn"
+            class="flex-1 py-2.5 bg-clinic-600 hover:bg-clinic-700 text-white font-bold rounded-xl transition-all shadow-md cursor-pointer">
+            دخول للعيادة
+          </button>
+          <button type="button" onclick="closeDoctorAuthModal()" class="px-3.5 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 cursor-pointer">
+            إلغاء
+          </button>
+        </div>
+      </form>
+
+      <!-- Forgot Password View -->
+      <div id="forgotPasswordView" class="hidden space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1" for="doctorResetEmail">البريد الإلكتروني للعيادة</label>
+          <input type="email" id="doctorResetEmail" required placeholder="dsa10company@gmail.com" dir="ltr"
+            class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-clinic-500 font-semibold text-slate-800">
+        </div>
+
+        <p class="text-[11px] text-slate-500 leading-relaxed">
+          أدخل بريدك الإلكتروني المسجل وسيقوم نظام فايرباس بإرسال رابط رسمي مباشر لتعيين كلمة مرور جديدة لحسابك.
+        </p>
+
+        <button type="button" id="sendResetBtn" onclick="sendPasswordResetRequest()" class="w-full py-2.5 bg-clinic-600 hover:bg-clinic-700 text-white font-bold rounded-xl transition-all shadow-md cursor-pointer">
+          إرسال رابط تعيين كلمة المرور
+        </button>
         
-        <!-- Customization Card -->
-        <div class="glass-card rounded-3xl p-6 sm:p-7 shadow-xl border border-cyan-100">
-          <div class="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-            <div class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
-              🦷
-            </div>
-            <div>
-              <h3 class="font-bold text-slate-800 text-lg">تخصيص محتوى عيادة الأسنان</h3>
-              <p class="text-xs text-slate-500">اختر نوع الخدمة مع الحفاظ التام على هوية وطابع عيادة الأسنان</p>
-            </div>
-          </div>
-
-          <div class="space-y-5">
-            <!-- QR Content Type Selector (All Dental Hybrid Presets) -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-2">نوع الخدمة السنّية المراد تحويلها لباركود:</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                
-                <button type="button" onclick="setQrType('url')" id="typeBtn-url" class="type-btn border-2 border-cyan-600 bg-cyan-50/70 rounded-xl p-2.5 flex flex-col items-center gap-1.5 transition-all text-center">
-                  <span class="text-lg">🦷🌐</span>
-                  <span class="text-xs font-bold text-slate-800">موقع العيادة</span>
-                  <span class="text-[10px] text-cyan-700 leading-tight">حجز وخدمات</span>
-                </button>
-
-                <button type="button" onclick="setQrType('wifi')" id="typeBtn-wifi" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
-                  <span class="text-lg">🦷📶</span>
-                  <span class="text-xs font-bold text-slate-800">واي فاي الانتظار</span>
-                  <span class="text-[10px] text-slate-500 leading-tight">اتصال فوري</span>
-                </button>
-
-                <button type="button" onclick="setQrType('whatsapp')" id="typeBtn-whatsapp" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
-                  <span class="text-lg">🦷💬</span>
-                  <span class="text-xs font-bold text-slate-800">واتساب الطوارئ</span>
-                  <span class="text-[10px] text-slate-500 leading-tight">محادثة كشف</span>
-                </button>
-
-                <button type="button" onclick="setQrType('vcard')" id="typeBtn-vcard" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
-                  <span class="text-lg">🦷🪪</span>
-                  <span class="text-xs font-bold text-slate-800">بطاقة الطبيب</span>
-                  <span class="text-[10px] text-slate-500 leading-tight">حفظ جهة الاتصال</span>
-                </button>
-
-              </div>
-            </div>
-
-            <!-- DYNAMIC INPUT FIELDS BASED ON QR TYPE -->
-
-            <!-- 1. URL Section -->
-            <div id="section-url" class="p-4 bg-cyan-50/50 rounded-2xl border border-cyan-200 space-y-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">رابط موقع العيادة (Doctor.S Website):</label>
-                <input id="inputUrl" type="url" value="https://nurse9sy-cyber.github.io/Doctor.S/" oninput="onDataChanged()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
-              </div>
-            </div>
-
-            <!-- 2. Wi-Fi Section -->
-            <div id="section-wifi" class="hidden p-4 bg-gradient-to-br from-cyan-50/90 to-teal-50/70 rounded-2xl border border-cyan-300 space-y-3">
-              <div class="flex items-center gap-2 text-cyan-900 font-bold text-xs bg-white/70 p-2.5 rounded-xl border border-cyan-200">
-                <span class="text-base">🦷📶</span>
-                <span>واي فاي صالة استقبال الأسنان: بمجرد توجيه الكاميرا يتصل هاتف المريض مباشرة دون عناء كتابة الرمز!</span>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">اسم شبكة واي فاي العيادة (SSID):</label>
-                <input id="inputWifiSsid" type="text" value="Doctor.S_Dental_Clinic" oninput="onDataChanged()" placeholder="Doctor.S_Dental_Clinic" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
-              </div>
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="text-xs font-bold text-slate-700">كلمة سر الشبكة (Password):</label>
-                  <label class="text-[11px] text-slate-500 flex items-center gap-1 cursor-pointer">
-                    <input type="checkbox" id="toggleWifiPass" onchange="togglePassVisibility()" class="rounded text-cyan-600 focus:ring-0">
-                    <span>إظهار الرمز</span>
-                  </label>
-                </div>
-                <input id="inputWifiPassword" type="password" value="Clinic@2026" oninput="onDataChanged()" placeholder="كلمة المرور للشبكة" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">نوع التشفير:</label>
-                  <select id="inputWifiAuth" onchange="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-cyan-500 outline-none">
-                    <option value="WPA" selected>WPA / WPA2 / WPA3 (القياسي)</option>
-                    <option value="nopass">شبكة زوار مفتوحة بدون كلمة سر</option>
-                    <option value="WEP">WEP</option>
-                  </select>
-                </div>
-                <div class="flex items-center pt-5">
-                  <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
-                    <input type="checkbox" id="inputWifiHidden" onchange="onDataChanged()" class="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500">
-                    <span>شبكة مخفية (Hidden)</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- 3. WhatsApp Section -->
-            <div id="section-whatsapp" class="hidden p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-3">
-              <div class="flex items-center gap-2 text-emerald-900 font-bold text-xs bg-white/70 p-2 rounded-xl border border-emerald-200">
-                <span class="text-base">🦷💬</span>
-                <span>حجز سريع عبر واتساب عيادة الأسنان لحالات الطوارئ والكشف</span>
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">رقم واتساب العيادة (استخدم 00 للكود الدولي دون أي إشارة زائد):</label>
-                <input id="inputWaPhone" type="text" value="00963900000000" oninput="sanitizePhoneInput(this); onDataChanged()" placeholder="00963900000000" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all font-mono" dir="ltr">
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">الرسالة المجهزة تلقائياً للمريض:</label>
-                <textarea id="inputWaMessage" rows="2" oninput="onDataChanged()" class="w-full text-xs px-3.5 py-2 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none">مرحباً د. سارة، أود الاستفسار وحجز موعد كشف أو تبييض أسنان بالعيادة.</textarea>
-              </div>
-            </div>
-
-            <!-- 4. vCard Contact Section -->
-            <div id="section-vcard" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-              <div class="flex items-center gap-2 text-cyan-900 font-bold text-xs bg-white/70 p-2 rounded-xl border border-cyan-200">
-                <span class="text-base">🦷🪪</span>
-                <span>بطاقة اتصال إلكترونية لحفظ رقم وعنوان عيادة الأسنان بضغطة زر</span>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">الاسم واللقب الطبي:</label>
-                  <input id="inputVcardName" type="text" value="د. سارة لطب وتجميل الأسنان" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف العيادة (أرقام فقط أو 00 دون إشارة زائد):</label>
-                  <input id="inputVcardPhone" type="text" value="00963900000000" oninput="sanitizePhoneInput(this); onDataChanged()" placeholder="00963900000000" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none font-mono" dir="ltr">
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني للعيادة:</label>
-                  <input id="inputVcardEmail" type="email" value="clinic@doctors.com" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none font-mono" dir="ltr">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">العنوان والمدينة:</label>
-                  <input id="inputVcardAddress" type="text" value="عيادة د. سارة لطب الأسنان" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none">
-                </div>
-              </div>
-            </div>
-
-            <!-- Dental Color Palette Selector -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-2">ألوان الهوية الطبية لعيادة الأسنان:</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <button type="button" onclick="setPalette('cyan')" class="palette-btn border-2 border-cyan-500 rounded-xl p-2.5 flex flex-col items-center gap-1.5 bg-cyan-50/50 transition-all hover:shadow-sm">
-                  <div class="flex gap-1">
-                    <span class="w-4 h-4 rounded-full bg-[#0891b2]"></span>
-                    <span class="w-4 h-4 rounded-full bg-[#0e7490]"></span>
-                  </div>
-                  <span class="text-xs font-bold text-cyan-900">سماوي عيادات</span>
-                </button>
-                <button type="button" onclick="setPalette('ocean')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
-                  <div class="flex gap-1">
-                    <span class="w-4 h-4 rounded-full bg-[#1e40af]"></span>
-                    <span class="w-4 h-4 rounded-full bg-[#0369a1]"></span>
-                  </div>
-                  <span class="text-xs font-bold text-slate-700">أزرق جراحي</span>
-                </button>
-                <button type="button" onclick="setPalette('emerald')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
-                  <div class="flex gap-1">
-                    <span class="w-4 h-4 rounded-full bg-[#059669]"></span>
-                    <span class="w-4 h-4 rounded-full bg-[#0f766e]"></span>
-                  </div>
-                  <span class="text-xs font-bold text-slate-700">أخضر معقم</span>
-                </button>
-                <button type="button" onclick="setPalette('dark')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
-                  <div class="flex gap-1">
-                    <span class="w-4 h-4 rounded-full bg-[#0f172a]"></span>
-                    <span class="w-4 h-4 rounded-full bg-[#334155]"></span>
-                  </div>
-                  <span class="text-xs font-bold text-slate-700">كحلي فاخر</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Dental Center Icon Selector (All Dental-Themed) -->
-            <div>
-              <label class="block text-xs font-bold text-slate-700 mb-2">أيقونة السن المدمجة في منتصف الباركود (Dental Icons):</label>
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                
-                <button type="button" onclick="setCenterIcon('tooth-pure')" id="iconBtn-tooth-pure" class="icon-btn border-2 border-cyan-500 bg-cyan-50/50 py-2 px-2.5 rounded-xl text-xs font-bold text-cyan-900 flex items-center justify-center gap-1.5">
-                  <span class="text-sm">🦷✨</span>
-                  <span>سن ناصع</span>
-                </button>
-
-                <button type="button" onclick="setCenterIcon('tooth-wifi')" id="iconBtn-tooth-wifi" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <span class="text-sm">🦷📶</span>
-                  <span>سن وواي فاي</span>
-                </button>
-
-                <button type="button" onclick="setCenterIcon('tooth-chat')" id="iconBtn-tooth-chat" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <span class="text-sm">🦷💬</span>
-                  <span>سن وحجز</span>
-                </button>
-
-                <button type="button" onclick="setCenterIcon('tooth-doctor')" id="iconBtn-tooth-doctor" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
-                  <span class="text-sm">🦷🔍</span>
-                  <span>سن ومرآة فحص</span>
-                </button>
-
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-100 space-y-3">
-              <div>
-                <label class="block text-xs font-bold text-slate-700 mb-1">اسم العيادة / الطبيب في البطاقة:</label>
-                <input id="inputTitle" type="text" value="عيادة د. سارة لطب وتجميل الأسنان" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">الوصف التخصصي للعيادة:</label>
-                  <input id="inputSubtitle" type="text" value="Dental & Aesthetic Clinic" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">نص الإرشاد الموجه للمريض في العيادة:</label>
-                  <input id="inputAction" type="text" value="امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
-                </div>
-              </div>
-
-              <!-- Dental Footer Slogan Control (Edit or Delete) -->
-              <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-2">
-                <div class="flex items-center justify-between">
-                  <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <span>🦷</span>
-                    <span>الجملة الختامية / شعار أسفل البطاقة واللوحة:</span>
-                  </label>
-                  <div class="flex items-center gap-3">
-                    <label class="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer font-medium">
-                      <input type="checkbox" id="toggleSlogan" checked onchange="toggleSloganVisibility()" class="rounded text-cyan-600 focus:ring-0 w-3.5 h-3.5">
-                      <span>إظهار الجملة</span>
-                    </label>
-                    <button type="button" onclick="clearSlogan()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline">
-                      حذف نهائي ✕
-                    </button>
-                  </div>
-                </div>
-                <div class="flex gap-2">
-                  <input id="inputSlogan" type="text" value="ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨" oninput="updateCardTexts()" placeholder="اكتب جملتك المخصصة هنا أو اتركها فارغة للحذف..." class="flex-1 text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all bg-white">
-                  <button type="button" onclick="resetDefaultSlogan()" title="استعادة الجملة الافتراضية" class="px-2.5 py-1 text-xs font-semibold text-cyan-800 bg-cyan-100 hover:bg-cyan-200 rounded-xl transition-colors shrink-0">
-                    استعادة
-                  </button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- Clinical Feature Badges -->
-        <div class="grid grid-cols-3 gap-3">
-          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
-            <span class="text-xl block mb-1">🖨️</span>
-            <h4 class="text-xs font-bold text-slate-800">طبعة عيادة فاخرة</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">جاهز للاستاند والأكريليك</p>
-          </div>
-          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
-            <span class="text-xl block mb-1">🦷</span>
-            <h4 class="text-xs font-bold text-slate-800">طابع سني متكامل</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">لكل أنواع الباركود</p>
-          </div>
-          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
-            <span class="text-xl block mb-1">⚡</span>
-            <h4 class="text-xs font-bold text-slate-800">قراءة فائقة السرعة</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">تصحيح أخطاء مستوى H</p>
-          </div>
-        </div>
-
+        <button type="button" onclick="backToLoginFromForgot()" class="w-full py-2 text-center text-slate-500 hover:text-slate-800 font-semibold cursor-pointer">
+          ← العودة لتسجيل الدخول
+        </button>
       </div>
 
     </div>
-  </main>
-
-  <!-- Notification Toast Container -->
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-semibold shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2">
-    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-    <span id="toastMsg">تم النسخ بنجاح</span>
   </div>
 
+  <!-- MODAL: CLINIC SETTINGS -->
+  <div id="clinicSettingsModal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 no-print">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-1.5">
+          <span>⚙️</span> إعدادات العيادة وساعات العمل
+        </h3>
+        <button onclick="closeClinicSettingsModal()" class="text-slate-400 hover:text-slate-600 font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <form id="clinicSettingsForm" onsubmit="saveClinicSettings(event)" class="space-y-3.5 text-xs">
+        
+        <!-- Doctor Title and Name -->
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">اللقب</label>
+            <select id="settingDoctorGender" class="w-full px-2.5 py-2 rounded-xl border border-slate-300 font-bold">
+              <option value="د.">د. (طبيب)</option>
+              <option value="دكتورة" selected>دكتورة (طبيبة)</option>
+            </select>
+          </div>
+          <div class="col-span-2">
+            <label class="block font-bold text-slate-700 mb-1">اسم الطبيب/ة الكامل *</label>
+            <input type="text" id="settingDoctorName" required placeholder="مثال: صفاء"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+          </div>
+        </div>
+
+        <!-- Specialty -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">تخصص العيادة</label>
+          <input type="text" id="settingSpecialty" required placeholder="مثال: جراحة وزراعة وتجميل الأسنان"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300">
+        </div>
+
+        <!-- Hours -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">ساعة بدء الدوام (لتوليد الخانات)</label>
+            <input type="time" id="settingStartHour" required value="10:30"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">ساعة انتهاء الدوام</label>
+            <input type="time" id="settingEndHour" required value="20:30"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+          </div>
+        </div>
+
+        <!-- Custom Schedule Notes & Shifts -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">ملاحظات ومواعيد الدوام المخصصة (فترات العمل)</label>
+          <textarea id="settingScheduleNotes" rows="2" placeholder="مثال: من الساعة 9:00 صباحاً إلى 3:00 بعد الظهر، ومن الساعة 6:00 مساءً إلى 9:00 ليلاً"
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-clinic-500"></textarea>
+          <p class="text-[10px] text-slate-500 mt-1">تظهر هذه المواعيد والتفاصيل فوراً للمريض في شريط الحجز العلوي كأوقات الدوام الرسمية.</p>
+        </div>
+
+        <!-- Work Days -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">أيام العمل الأسبوعية المعتمدة:</label>
+          <div class="grid grid-cols-4 sm:grid-cols-7 gap-1 text-center">
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="sat" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">السبت</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="sun" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الأحد</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="mon" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الإثنين</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="tue" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الثلاثاء</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="wed" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الأربعاء</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="thu" checked class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الخميس</div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="checkbox" name="workDaySetting" value="fri" class="peer sr-only">
+              <div class="py-1.5 rounded-lg border border-slate-200 peer-checked:bg-clinic-600 peer-checked:text-white font-bold text-[10px]">الجمعة</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Capacity & Slot Duration -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">الحد الأقصى للمرضى يومياً</label>
+            <input type="number" id="settingMaxCapacity" min="1" max="80" value="15" required
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">مدة الموعد (دقيقة)</label>
+            <select id="settingSlotDuration" class="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold">
+              <option value="10">10 دقائق</option>
+              <option value="15">15 دقيقة</option>
+              <option value="20">20 دقيقة</option>
+              <option value="25">25 دقيقة</option>
+              <option value="30">30 دقيقة</option>
+              <option value="35">35 دقيقة</option>
+              <option value="40">40 دقيقة</option>
+              <option value="45" selected>45 دقيقة</option>
+              <option value="50">50 دقيقة</option>
+              <option value="55">55 دقيقة</option>
+              <option value="60">60 دقيقة (ساعة كاملة)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Option: Hide / Show remaining seats from patients -->
+        <div class="p-3 bg-teal-50/60 rounded-xl border border-teal-100 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-slate-800 text-xs">إظهار المقاعد المتبقية للمرضى</div>
+            <div class="text-[10px] text-slate-500">إذا عطلت الخيار، سيظهر للمريض "الحجز متاح" دون كشف الأرقام والعدد المتبقي</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="settingShowRemainingSeats" checked class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-clinic-600"></div>
+          </label>
+        </div>
+
+        <!-- Address and Phone -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">عنوان العيادة</label>
+            <input type="text" id="settingAddress" required placeholder="أدخل عنوان وموقع العيادة"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300">
+          </div>
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">هاتف العيادة</label>
+            <input type="tel" id="settingPhone" required placeholder="09xxxxxxxx" dir="ltr"
+              class="w-full px-3 py-2 rounded-xl border border-slate-300 text-right">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button type="submit" class="flex-1 py-2.5 bg-clinic-600 hover:bg-clinic-700 text-white font-bold rounded-xl shadow-md transition-all cursor-pointer">
+            حفظ وتحديث فوري للمرضى ✓
+          </button>
+          <button type="button" onclick="closeClinicSettingsModal()" class="px-4 py-2.5 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 cursor-pointer">
+            إلغاء
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- APPLICATION LOGIC SCRIPT -->
   <script>
-    // 1. Pure Pearly Tooth with Sparkle
-    const toothPureSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
-        <path fill="#0891b2" d="M50 18C37 18 28 25 24 33C18 44 18 56 20 69C23 88 31 92 37 92C40 92 43 89 45 84C47 80 48 70 50 70C52 70 53 80 55 84C57 89 60 92 63 92C69 92 77 88 80 69C82 56 82 44 76 33C72 25 63 18 50 18ZM34 37C37 37 40 40 39 44C37 51 32 57 25 58C21 59 19 56 20 52C21 43 27 37 34 37Z"/>
-        <polygon points="76,20 78,26 84,28 78,30 76,36 74,30 68,28 74,26" fill="#06b6d4" />
-        <polygon points="26,24 27,28 31,29 27,30 26,34 25,30 21,29 25,28" fill="#06b6d4" />
-      </svg>
-    `)}`;
-
-    // 2. Dental Tooth and Radiating Wi-Fi Waves
-    const toothWifiSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
-        <!-- Radiating Wi-Fi Waves above tooth crown -->
-        <path fill="none" stroke="#0891b2" stroke-width="4.5" stroke-linecap="round" d="M30 24 A 28 28 0 0 1 70 24" />
-        <path fill="none" stroke="#0891b2" stroke-width="4.5" stroke-linecap="round" d="M38 31 A 18 18 0 0 1 62 31" />
-        <circle cx="50" cy="37" r="3" fill="#0891b2" />
-        <!-- Dental Tooth Base -->
-        <path fill="#0891b2" d="M50 44C40 44 33 49 30 55C25 64 25 72 27 82C29 93 35 96 39 96C42 96 44 93 46 89C47 86 48 80 50 80C52 80 53 86 54 89C56 93 58 96 61 96C65 96 71 93 73 82C75 72 75 64 70 55C67 49 60 44 50 44Z"/>
-      </svg>
-    `)}`;
-
-    // 3. Dental Tooth and WhatsApp Chat Bubble
-    const toothChatSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
-        <!-- Tooth on left -->
-        <path fill="#0891b2" d="M42 22C32 22 25 28 22 34C17 43 17 53 19 63C21 78 27 82 32 82C35 82 37 79 38 75C39 72 40 65 42 65C44 65 45 72 46 75C47 79 49 82 52 82C57 82 63 78 65 63C66 57 66 52 64 47C62 47 60 47 58 47C50 47 43 43 38 37C34 32 32 27 33 22C36 22 39 22 42 22Z"/>
-        <!-- Chat Bubble on right -->
-        <circle cx="68" cy="38" r="18" fill="#10b981" />
-        <path fill="#10b981" d="M57 48 L 53 58 L 64 52 Z" />
-        <!-- Phone icon inside bubble -->
-        <path fill="#ffffff" d="M63 32 C62 31 60 31 59 32 L58 33 C57 34 57 35 58 36 C59 38 61 40 63 42 C64 43 66 44 67 43 L68 42 C69 41 69 39 68 38 L67 37 C66 36 65 36 64 37 L63 38 Z" />
-      </svg>
-    `)}`;
-
-    // 4. Dental Tooth and Dental Inspection Mirror (No plus/cross signs)
-    const toothDoctorSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
-        <!-- Main Dental Tooth -->
-        <path fill="#0891b2" d="M50 16C37 16 28 23 24 31C18 42 18 54 20 67C23 87 31 92 37 92C40 92 43 89 45 84C47 80 48 69 50 69C52 69 53 80 55 84C57 89 60 92 63 92C69 92 77 87 80 67C82 54 82 42 76 31C72 23 63 16 50 16Z"/>
-        <!-- Dental Inspection Mirror (No cross/plus sign) -->
-        <circle cx="50" cy="45" r="13" fill="#ffffff" stroke="#0891b2" stroke-width="3" />
-        <circle cx="50" cy="45" r="8" fill="#cffafe" />
-        <path fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" d="M50 58 L50 78" />
-      </svg>
-    `)}`;
-
-    // Palette Configurations
-    const PALETTES = {
-      cyan: {
-        dotColor: "#0891b2",
-        cornerSquareColor: "#0e7490",
-        cornerDotColor: "#06b6d4",
-        gradientStart: "#0891b2",
-        gradientEnd: "#0e7490",
-        accent: "#0891b2"
-      },
-      ocean: {
-        dotColor: "#1d4ed8",
-        cornerSquareColor: "#1e3a8a",
-        cornerDotColor: "#2563eb",
-        gradientStart: "#1d4ed8",
-        gradientEnd: "#1e3a8a",
-        accent: "#1d4ed8"
-      },
-      emerald: {
-        dotColor: "#059669",
-        cornerSquareColor: "#064e3b",
-        cornerDotColor: "#10b981",
-        gradientStart: "#059669",
-        gradientEnd: "#065f46",
-        accent: "#059669"
-      },
-      dark: {
-        dotColor: "#0f172a",
-        cornerSquareColor: "#020617",
-        cornerDotColor: "#334155",
-        gradientStart: "#0f172a",
-        gradientEnd: "#1e293b",
-        accent: "#0f172a"
-      }
+    // ==========================================
+    // 1. تهيئة FIREBASE الحقيقية لمشروع العيادة الجديد (doctor-safaa)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6A577AdjB7ms0WIaLm7HOZmn9vsAX5Jo",
+      authDomain: "doctor-safaa.firebaseapp.com",
+      projectId: "doctor-safaa",
+      storageBucket: "doctor-safaa.firebasestorage.app",
+      messagingSenderId: "288312383726",
+      appId: "1:288312383726:web:e6bb48af566a77f3a07bff",
+      measurementId: "G-FQG79TEPJ0"
     };
 
-    // State Variables
-    let currentQrType = 'url';
-    let currentPaletteKey = 'cyan';
-    let currentDotType = 'rounded';
-    let currentIconKey = 'tooth-pure';
-    let qrCodeInstance = null;
+    let db = null;
+    let auth = null;
+    let isFirebaseReady = false;
 
-    // Remove any plus signs from inputs automatically
-    function sanitizePhoneInput(inputElement) {
-      if (inputElement && inputElement.value) {
-        inputElement.value = inputElement.value.replace(/\+/g, '');
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
       }
+      db = firebase.firestore();
+      auth = firebase.auth();
+      isFirebaseReady = true;
+    } catch (err) {
+      console.warn("تعذر الاتصال بـ Firebase:", err);
     }
 
-    // Global listener to prevent any plus signs from persisting across any inputs
-    document.addEventListener('input', (e) => {
-      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
-        if (e.target.value && e.target.value.includes('+')) {
-          e.target.value = e.target.value.replace(/\+/g, '');
-          onDataChanged();
-        }
+    // الحالة الافتراضية
+    const defaultClinicConfig = {
+      doctorGender: "دكتورة",
+      doctorName: "",
+      specialty: "طب وجراحة وتجميل الأسنان",
+      startHour: "10:30",
+      endHour: "20:30",
+      scheduleNotes: "",
+      workDays: ["sat", "sun", "mon", "tue", "wed", "thu"],
+      maxDailyCapacity: 15,
+      slotDuration: 45,
+      showRemainingSeatsToPatients: true,
+      address: "",
+      phone: "",
+      clinicManuallyClosed: false
+    };
+
+    // الذاكرة التخزينية المحلية المستقلة للعيادة الجديدة
+    let clinicConfig = { ...defaultClinicConfig };
+    try {
+      const stored = localStorage.getItem('clinic_profile_cache_safaa');
+      if (stored) {
+        clinicConfig = { ...defaultClinicConfig, ...JSON.parse(stored) };
       }
-    });
+    } catch (e) {}
 
-    // Build the raw encoded payload based on selected QR type
-    function getQrPayload() {
-      if (currentQrType === 'wifi') {
-        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
-        const pass = document.getElementById("inputWifiPassword").value || "";
-        const auth = document.getElementById("inputWifiAuth").value || "WPA";
-        const hidden = document.getElementById("inputWifiHidden").checked ? "true" : "false";
+    let todayAppointments = [];
+    let currentDoctorUser = null;
+    let isSoundEnabled = true;
+    let authTabMode = 'login';
+    let appointmentsUnsubscribe = null;
+    let settingsUnsubscribe = null;
+    let isInitialLoad = true;
 
-        // Wi-Fi standard schema: WIFI:S:<SSID>;T:<WPA|WEP|nopass>;P:<PASSWORD>;H:<true|false>;;
-        const cleanSsid = ssid.replace(/([\\;,:"])/g, '\\$1');
-        const cleanPass = pass.replace(/([\\;,:"])/g, '\\$1');
-        return `WIFI:S:${cleanSsid};T:${auth};P:${cleanPass};H:${hidden};;`;
-      }
+    const dayNamesAr = {
+      sat: "السبت",
+      sun: "الأحد",
+      mon: "الإثنين",
+      tue: "الثلاثاء",
+      wed: "الأربعاء",
+      thu: "الخميس",
+      fri: "الجمعة"
+    };
 
-      if (currentQrType === 'whatsapp') {
-        // Strip out any plus signs or non-digits
-        const rawPhone = document.getElementById("inputWaPhone").value.replace(/[^0-9]/g, "");
-        const message = encodeURIComponent(document.getElementById("inputWaMessage").value || "");
-        return `https://wa.me/${rawPhone}?text=${message}`;
-      }
+    // تطبيق الإعدادات الفورية من الذاكرة المحلية
+    applySettingsToUI(clinicConfig);
 
-      if (currentQrType === 'vcard') {
-        const name = document.getElementById("inputVcardName").value || "د. سارة لطب وتجميل الأسنان";
-        const phone = document.getElementById("inputVcardPhone").value.replace(/[^0-9]/g, "") || "";
-        const email = document.getElementById("inputVcardEmail").value || "";
-        const address = document.getElementById("inputVcardAddress").value || "";
-        const website = "https://nurse9sy-cyber.github.io/Doctor.S/";
-
-        return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:عيادة د. سارة لطب وجراحة وتجميل الأسنان\nTITLE:طبيبة وجراحة أسنان\nTEL:${phone}\nEMAIL:${email}\nADR:;;${address};;;\nURL:${website}\nEND:VCARD`;
-      }
-
-      // Default: Dental Clinic URL
-      return document.getElementById("inputUrl").value.trim() || "https://nurse9sy-cyber.github.io/Doctor.S/";
-    }
-
-    // Always returns an icon that strongly reflects dentistry
-    function getSelectedIconUrl() {
-      if (currentIconKey === 'tooth-wifi') return toothWifiSvg;
-      if (currentIconKey === 'tooth-chat') return toothChatSvg;
-      if (currentIconKey === 'tooth-doctor') return toothDoctorSvg;
-      return toothPureSvg;
-    }
-
-    function createQrOptions(size = 280) {
-      const palette = PALETTES[currentPaletteKey];
-      return {
-        width: size,
-        height: size,
-        data: getQrPayload(),
-        image: getSelectedIconUrl(),
-        margin: 6,
-        qrOptions: {
-          typeNumber: 0,
-          mode: 'Byte',
-          errorCorrectionLevel: 'H'
-        },
-        imageOptions: {
-          hideBackgroundDots: true,
-          imageSize: 0.36,
-          margin: 4,
-          crossOrigin: 'anonymous'
-        },
-        dotsOptions: {
-          type: currentDotType,
-          gradient: {
-            type: "linear",
-            rotation: 45,
-            colorStops: [
-              { offset: 0, color: palette.gradientStart },
-              { offset: 1, color: palette.gradientEnd }
-            ]
-          }
-        },
-        backgroundOptions: {
-          color: "#ffffff"
-        },
-        cornersSquareOptions: {
-          type: "extra-rounded",
-          color: palette.cornerSquareColor
-        },
-        cornersDotOptions: {
-          type: "dot",
-          color: palette.cornerDotColor
-        }
-      };
-    }
-
-    function renderQr() {
-      const container = document.getElementById("qrCodeDiv");
-      container.innerHTML = "";
-      
-      const options = createQrOptions(280);
-      qrCodeInstance = new QRCodeStyling(options);
-      qrCodeInstance.append(container);
-
-      // Render into standalone view container as well
-      const standaloneContainer = document.getElementById("qrStandaloneClone");
-      if (standaloneContainer) {
-        standaloneContainer.innerHTML = "";
-        const standaloneQr = new QRCodeStyling(createQrOptions(300));
-        standaloneQr.append(standaloneContainer);
-      }
-
-      updateCardEmblemIcon();
-      updateBannerAndCardInfo();
-    }
-
-    // Updates top badge on the clinic card
-    function updateCardEmblemIcon() {
-      const emblemInner = document.getElementById("cardEmblemInner");
-      let iconMarkup = '';
-
-      if (currentIconKey === 'tooth-wifi' || currentQrType === 'wifi') {
-        iconMarkup = `
-          <svg viewBox="0 0 24 24" class="w-full h-full fill-white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
-          </svg>`;
-      } else {
-        iconMarkup = `
-          <svg viewBox="0 0 24 24" class="w-full h-full fill-white" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
-          </svg>`;
-      }
-      emblemInner.innerHTML = iconMarkup;
-    }
-
-    // Handler when user switches QR type
-    function setQrType(type) {
-      currentQrType = type;
-      
-      // Update Tab button active styles
-      ['url', 'wifi', 'whatsapp', 'vcard'].forEach(t => {
-        const btn = document.getElementById(`typeBtn-${t}`);
-        const section = document.getElementById(`section-${t}`);
-        if (t === type) {
-          btn.className = "type-btn border-2 border-cyan-600 bg-cyan-50/70 rounded-xl p-2.5 flex flex-col items-center gap-1.5 transition-all text-center";
-          section.classList.remove('hidden');
+    // ==========================================
+    // 2. إدارة جلسة الطبيب
+    // ==========================================
+    if (auth) {
+      auth.onAuthStateChanged((user) => {
+        currentDoctorUser = user;
+        if (user) {
+          // الطبيب مسجل دخوله:
+          document.getElementById('viewPatient').classList.add('hidden');
+          document.getElementById('viewDoctorDashboard').classList.remove('hidden');
+          document.getElementById('viewDoctorAnalytics').classList.add('hidden');
+          document.getElementById('doctorAuthBar').classList.remove('hidden');
+          document.getElementById('doctorNavTabs').classList.remove('hidden');
+          document.getElementById('footerDoctorLoginBtn').classList.add('hidden');
+          document.getElementById('doctorLoggedInEmail').textContent = user.email;
+          
+          setTabActiveVisual('tabDoctorLive');
         } else {
-          btn.className = "type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center";
-          section.classList.add('hidden');
+          // وضع المريض:
+          document.getElementById('viewPatient').classList.remove('hidden');
+          document.getElementById('viewDoctorDashboard').classList.add('hidden');
+          document.getElementById('viewDoctorAnalytics').classList.add('hidden');
+          document.getElementById('doctorAuthBar').classList.add('hidden');
+          document.getElementById('doctorNavTabs').classList.add('hidden');
+          document.getElementById('footerDoctorLoginBtn').classList.remove('hidden');
         }
+        recalculateCapacity();
+        generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
       });
-
-      // Auto assign matched dental-hybrid icon
-      if (type === 'wifi') {
-        highlightCenterIcon('tooth-wifi');
-      } else if (type === 'whatsapp') {
-        highlightCenterIcon('tooth-chat');
-      } else if (type === 'vcard') {
-        highlightCenterIcon('tooth-doctor');
-      } else {
-        highlightCenterIcon('tooth-pure');
-      }
-
-      // Dental specific texts per service
-      const titleInput = document.getElementById("inputTitle");
-      const subtitleInput = document.getElementById("inputSubtitle");
-      const actionInput = document.getElementById("inputAction");
-
-      if (type === 'wifi') {
-        titleInput.value = "واي فاي صالة انتظار عيادة الأسنان";
-        subtitleInput.value = "Doctor.S Dental Clinic - Free Patient Wi-Fi";
-        actionInput.value = "امسح الكود بكاميرا هاتفك للاتصال فورا بشبكة العيادة بدون إدخال الرمز";
-      } else if (type === 'whatsapp') {
-        titleInput.value = "حجز ومتابعة حالات الأسنان (واتساب)";
-        subtitleInput.value = "Doctor.S Dental Booking & Emergency Desk";
-        actionInput.value = "امسح الكود لبدء محادثة فورية وحجز موعد كشف أو تبييض أسنان";
-      } else if (type === 'vcard') {
-        titleInput.value = "بطاقة التواصل لعيادة د. سارة للأسنان";
-        subtitleInput.value = "Save Dental Clinic Contact & Emergency";
-        actionInput.value = "امسح الكود لحفظ هاتف وعنوان عيادة الأسنان مباشرة في هاتفك";
-      } else {
-        titleInput.value = "عيادة د. سارة لطب وتجميل الأسنان";
-        subtitleInput.value = "Dental & Aesthetic Clinic";
-        actionInput.value = "امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك";
-      }
-
-      updateCardTexts();
-      renderQr();
-      showToast(`تم التبديل إلى: ${type === 'wifi' ? 'واي فاي عيادة الأسنان' : type === 'whatsapp' ? 'واتساب الأسنان' : type === 'vcard' ? 'بطاقة طبيب الأسنان' : 'موقع العيادة'}`);
     }
 
-    function highlightCenterIcon(iconKey) {
-      currentIconKey = iconKey;
-      ['tooth-pure', 'tooth-wifi', 'tooth-chat', 'tooth-doctor'].forEach(k => {
-        const btn = document.getElementById(`iconBtn-${k}`);
-        if (btn) {
-          if (k === iconKey) {
-            btn.className = "icon-btn border-2 border-cyan-500 bg-cyan-50/50 py-2 px-2.5 rounded-xl text-xs font-bold text-cyan-900 flex items-center justify-center gap-1.5";
+    // ==========================================
+    // 3. المزامنة اللحظية للإعدادات
+    // ==========================================
+    function listenToClinicSettingsRealtime() {
+      if (!db) {
+        applySettingsToUI(clinicConfig);
+        return;
+      }
+
+      settingsUnsubscribe = db.collection('clinic_settings').doc('config')
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            clinicConfig = { ...clinicConfig, ...data };
+            try {
+              localStorage.setItem('clinic_profile_cache_safaa', JSON.stringify(clinicConfig));
+            } catch(e) {}
+            applySettingsToUI(clinicConfig);
           } else {
-            btn.className = "icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5";
+            applySettingsToUI(clinicConfig);
+          }
+        }, (error) => {
+          console.error("خطأ في قراءة إعدادات العيادة:", error);
+          applySettingsToUI(clinicConfig);
+        });
+    }
+
+    function applySettingsToUI(cfg) {
+      const docName = (cfg.doctorName && cfg.doctorName.trim() !== "") ? cfg.doctorName.trim() : "";
+      const docTitle = (cfg.doctorGender || "دكتورة");
+      const fullDoctorDisplay = docName ? `${docTitle} ${docName}` : "طب وجراحة الأسنان";
+
+      document.getElementById('pageBrowserTitle').textContent = `حجز موعد - عيادة ${fullDoctorDisplay}`;
+      document.getElementById('navClinicTitle').textContent = `عيادة ${fullDoctorDisplay}`;
+      document.getElementById('navDoctorGenderBadge').textContent = cfg.doctorGender === 'دكتورة' ? 'طبيبة أسنان' : 'طبيب أسنان';
+      document.getElementById('bannerDoctorName').textContent = `عيادة ${fullDoctorDisplay} - ${cfg.specialty || "جراحة وزراعة وتجميل الأسنان"}`;
+      document.getElementById('footerClinicName').textContent = `عيادة ${fullDoctorDisplay}`;
+
+      const bannerScheduleNotes = document.getElementById('bannerScheduleNotesText');
+      if (bannerScheduleNotes) {
+        if (cfg.scheduleNotes && cfg.scheduleNotes.trim() !== "") {
+          bannerScheduleNotes.textContent = cfg.scheduleNotes.trim();
+        } else {
+          bannerScheduleNotes.textContent = `الدوام: من الساعة ${cfg.startHour || "10:30"} إلى ${cfg.endHour || "20:30"}`;
+        }
+      }
+
+      const bannerLocation = document.getElementById('bannerLocationText');
+      if (bannerLocation) {
+        bannerLocation.textContent = (cfg.address && cfg.address.trim() !== "") ? cfg.address : "المقر المعتمد للعيادة";
+      }
+
+      const bannerPhone = document.getElementById('bannerPhoneText');
+      if (bannerPhone) {
+        bannerPhone.textContent = (cfg.phone && cfg.phone.trim() !== "") ? cfg.phone : "---";
+      }
+
+      const daysText = (cfg.workDays || []).map(d => dayNamesAr[d]).join('، ');
+      document.getElementById('bannerDays').textContent = daysText || "السبت إلى الخميس";
+      document.getElementById('navWorkingHoursSummary').innerHTML = `
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+        الدوام: ${daysText || "طوال الأسبوع"} (${cfg.startHour || "10:30"} - ${cfg.endHour || "20:30"})
+      `;
+
+      document.getElementById('maxCapacityDisplay').textContent = cfg.maxDailyCapacity || 15;
+
+      const seatsContainer = document.getElementById('seatsCounterContainer');
+      if (cfg.showRemainingSeatsToPatients === false && !currentDoctorUser) {
+        seatsContainer.classList.add('hidden');
+      } else {
+        seatsContainer.classList.remove('hidden');
+      }
+
+      generateTimeSlots(cfg.startHour, cfg.endHour, cfg.slotDuration);
+      recalculateCapacity();
+    }
+
+    function cleanSlotString(str) {
+      if (!str) return '';
+      return str
+        .replace(/[\u0660-\u0669]/g, d => String.fromCharCode(d.charCodeAt(0) - 0x0660 + 0x0030))
+        .replace(/مساءً/g, 'م')
+        .replace(/صباحاً/g, 'ص')
+        .replace(/\s+/g, '')
+        .trim();
+    }
+
+    function generateTimeSlots(start, end, duration) {
+      const select = document.getElementById('timeSlotSelect');
+      if (!select) return;
+      
+      const currentSelected = select.value;
+      select.innerHTML = '';
+
+      const bookedCleanSlots = todayAppointments.map(a => cleanSlotString(a.timeSlot));
+
+      let [startH, startM] = (start || "10:30").split(':').map(Number);
+      let [endH, endM] = (end || "20:30").split(':').map(Number);
+
+      let currentTotal = startH * 60 + startM;
+      const endTotal = endH * 60 + endM;
+
+      let firstAvailableValue = null;
+
+      while (currentTotal < endTotal) {
+        const h = Math.floor(currentTotal / 60);
+        const m = currentTotal % 60;
+        
+        const period = h >= 12 ? 'مساءً' : 'صباحاً';
+        const displayH = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+        const timeStr = `${String(displayH).padStart(2, '0')}:${String(m).padStart(2, '0')} ${period}`;
+        
+        const isBooked = bookedCleanSlots.includes(cleanSlotString(timeStr));
+
+        const opt = document.createElement('option');
+        opt.value = timeStr;
+        if (isBooked) {
+          opt.disabled = true;
+          opt.textContent = `${timeStr} (محجوز ✕)`;
+          opt.className = 'text-rose-500 bg-slate-100 font-semibold';
+        } else {
+          opt.textContent = timeStr;
+          if (!firstAvailableValue) {
+            firstAvailableValue = timeStr;
           }
         }
-      });
-    }
+        select.appendChild(opt);
 
-    function setCenterIcon(iconKey) {
-      highlightCenterIcon(iconKey);
-      renderQr();
-      showToast("تم تحديث أيقونة السن في الباركود 🦷");
-    }
+        currentTotal += Number(duration || 45);
+      }
 
-    function onDataChanged() {
-      renderQr();
-    }
-
-    function togglePassVisibility() {
-      const passInput = document.getElementById("inputWifiPassword");
-      const check = document.getElementById("toggleWifiPass");
-      passInput.type = check.checked ? "text" : "password";
-    }
-
-    function updateBannerAndCardInfo() {
-      const urlDisplay = document.getElementById("urlDisplay");
-      const bannerLabel = document.getElementById("bannerTypeLabel");
-      const btnActionLabel = document.getElementById("btnActionLabel");
-      const wifiBadge = document.getElementById("wifiDetailsBadge");
-
-      if (currentQrType === 'wifi') {
-        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
-        const pass = document.getElementById("inputWifiPassword").value || "";
-        bannerLabel.innerText = "واي فاي صالة انتظار مرضى الأسنان";
-        urlDisplay.innerText = `شبكة: ${ssid} | كلمة المرور: ${pass}`;
-        btnActionLabel.innerText = "نسخ بيانات الشبكة";
-        if (wifiBadge) {
-          wifiBadge.classList.remove('hidden');
-          document.getElementById("cardWifiName").innerText = ssid;
-          document.getElementById("cardWifiPass").innerText = pass;
-        }
-      } else if (currentQrType === 'whatsapp') {
-        const phone = (document.getElementById("inputWaPhone").value || "").replace(/\+/g, '');
-        bannerLabel.innerText = "واتساب كشف وطوارئ الأسنان";
-        urlDisplay.innerText = phone ? `واتساب: ${phone}` : "واتساب العيادة";
-        btnActionLabel.innerText = "فتح محادثة واتساب";
-        if (wifiBadge) wifiBadge.classList.add('hidden');
-      } else if (currentQrType === 'vcard') {
-        const name = document.getElementById("inputVcardName").value || "د. سارة لطب وتجميل الأسنان";
-        const phone = (document.getElementById("inputVcardPhone").value || "").replace(/\+/g, '');
-        bannerLabel.innerText = "بطاقة جهة اتصال طبيب الأسنان";
-        urlDisplay.innerText = `${name} (${phone})`;
-        btnActionLabel.innerText = "تنزيل بطاقة جهة الاتصال";
-        if (wifiBadge) wifiBadge.classList.add('hidden');
+      if (currentSelected && !bookedCleanSlots.includes(cleanSlotString(currentSelected)) && Array.from(select.options).some(o => o.value === currentSelected && !o.disabled)) {
+        select.value = currentSelected;
+      } else if (firstAvailableValue) {
+        select.value = firstAvailableValue;
       } else {
-        const url = document.getElementById("inputUrl").value || "https://nurse9sy-cyber.github.io/Doctor.S/";
-        bannerLabel.innerText = "بيانات كود عيادة الأسنان";
-        urlDisplay.innerText = url;
-        btnActionLabel.innerText = "معاينة الرابط";
-        if (wifiBadge) wifiBadge.classList.add('hidden');
+        const fullOpt = document.createElement('option');
+        fullOpt.value = "";
+        fullOpt.disabled = true;
+        fullOpt.selected = true;
+        fullOpt.textContent = "لا توجد مواعيد شاغرة لليوم";
+        select.appendChild(fullOpt);
       }
     }
 
-    function copyClinicData() {
-      let textToCopy = getQrPayload();
-      if (currentQrType === 'wifi') {
-        const pass = document.getElementById("inputWifiPassword").value;
-        const ssid = document.getElementById("inputWifiSsid").value;
-        textToCopy = `شبكة واي فاي عيادة الأسنان: ${ssid}\nكلمة السر: ${pass}`;
+    // ==========================================
+    // 4. الاستماع اللحظي للحجوزات
+    // ==========================================
+    function listenToAppointmentsRealtime() {
+      if (!db) return;
+      if (appointmentsUnsubscribe) appointmentsUnsubscribe();
+
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      appointmentsUnsubscribe = db.collection('appointments')
+        .onSnapshot((snapshot) => {
+          let updated = [];
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            data.id = doc.id;
+            if (!data.date || data.date === todayStr) {
+              updated.push(data);
+            }
+          });
+
+          if (!isInitialLoad && snapshot.docChanges && currentDoctorUser) {
+            snapshot.docChanges().forEach((change) => {
+              if (change.type === 'added') {
+                const newBooking = change.doc.data();
+                triggerChimeSound();
+                triggerSystemNotification(newBooking);
+                showDoctorNotificationBanner(newBooking);
+              }
+            });
+          }
+          isInitialLoad = false;
+
+          todayAppointments = updated;
+          renderAppointmentsTable();
+          recalculateCapacity();
+          generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
+        }, (err) => {
+          console.error("خطأ في جلب المواعيد:", err);
+        });
+    }
+
+    function recalculateCapacity() {
+      const bookedSeats = todayAppointments.reduce((sum, item) => sum + (Number(item.partySize) || 1), 0);
+      const maxCap = Number(clinicConfig.maxDailyCapacity) || 15;
+      const seatsLeft = Math.max(0, maxCap - bookedSeats);
+
+      document.getElementById('remainingSeatsBadge').textContent = seatsLeft;
+      document.getElementById('metricSeatsLeft').textContent = seatsLeft;
+      document.getElementById('metricTotalPatients').textContent = todayAppointments.length;
+      
+      const newCount = todayAppointments.filter(a => a.type === 'new').length;
+      const followCount = todayAppointments.filter(a => a.type === 'followup').length;
+      document.getElementById('metricNewPatients').textContent = newCount;
+      document.getElementById('metricFollowupPatients').textContent = followCount;
+
+      const percent = Math.min(100, Math.round((seatsLeft / maxCap) * 100));
+      const progressBar = document.getElementById('capacityProgressBar');
+      progressBar.style.width = `${percent}%`;
+
+      const statusPill = document.getElementById('bookingStatusPill');
+      const submitBtn = document.getElementById('submitBookingBtn');
+
+      if (clinicConfig.clinicManuallyClosed) {
+        statusPill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40";
+        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span> الحجز متوقف مؤقتاً`;
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = `<span>الحجز متوقف مؤقتاً بأمر العيادة</span>`;
+      } else if (seatsLeft <= 0) {
+        statusPill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40";
+        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> اكتمل حجز اليوم بالكامل`;
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = `<span>اكتملت المقاعد لليوم - نعتذر</span>`;
+      } else {
+        statusPill.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+        statusPill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> الحجز متاح الآن`;
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitBtn.innerHTML = `
+          <span>تأكيد الحجز فوراً</span>
+          <svg class="w-4 h-4 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        `;
+      }
+    }
+
+    // ==========================================
+    // 5. حجز المريض
+    // ==========================================
+    async function handlePatientBooking(event) {
+      event.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBookingBtn');
+      const name = document.getElementById('patientName').value.trim();
+      const phone = document.getElementById('patientPhone').value.trim();
+      const type = document.querySelector('input[name="patientType"]:checked').value;
+      const service = document.getElementById('selectedServiceInput').value;
+      const partySize = Number(document.getElementById('partySizeSelect').value) || 1;
+      const timeSlot = document.getElementById('timeSlotSelect').value;
+      const notes = document.getElementById('patientNotes').value.trim();
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      if (!timeSlot) {
+        alert("يرجى اختيار موعد متاح من القائمة.");
+        return;
       }
 
-      const textarea = document.createElement("textarea");
-      textarea.value = textToCopy;
-      textarea.style.position = "fixed";
-      textarea.style.opacity = "0";
-      document.body.appendChild(textarea);
-      textarea.select();
+      const bookedSeats = todayAppointments.reduce((sum, item) => sum + (Number(item.partySize) || 1), 0);
+      const maxCap = Number(clinicConfig.maxDailyCapacity) || 15;
+      if (bookedSeats + partySize > maxCap) {
+        alert(`عذراً، المقاعد المتبقية (${Math.max(0, maxCap - bookedSeats)}) لا تكفي لحجز (${partySize}) أشخاص.`);
+        return;
+      }
+
+      const isSlotAlreadyTakenLocally = todayAppointments.some(item => cleanSlotString(item.timeSlot) === cleanSlotString(timeSlot));
+      if (isSlotAlreadyTakenLocally) {
+        alert(`عذراً، الموعد (${timeSlot}) تم حجزه مسبقاً! تم تحديث القائمة لاختيار موعد متاح آخر.`);
+        generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>جاري التحقق وتثبيت الحجز...</span>`;
+
       try {
-        document.execCommand('copy');
-        showToast("تم النسخ بنجاح إلى الحافظة!");
-      } catch (err) {
-        showToast("تعذر النسخ التلقائي");
-      }
-      document.body.removeChild(textarea);
-    }
+        if (db) {
+          const checkSnapshot = await db.collection('appointments')
+            .where('date', '==', todayStr)
+            .get();
 
-    function testQrAction() {
-      if (currentQrType === 'wifi') {
-        const pass = document.getElementById("inputWifiPassword").value;
-        copyClinicData();
-        showToast(`تم نسخ رمز واي فاي العيادة: ${pass}`);
-      } else if (currentQrType === 'whatsapp') {
-        window.open(getQrPayload(), '_blank');
-      } else if (currentQrType === 'vcard') {
-        const blob = new Blob([getQrPayload()], { type: 'text/vcard;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = "dental-clinic-card.vcf";
-        link.click();
-      } else {
-        window.open(document.getElementById("inputUrl").value, '_blank');
-      }
-    }
+          const isConflict = checkSnapshot.docs.some(doc => {
+            const data = doc.data();
+            return cleanSlotString(data.timeSlot) === cleanSlotString(timeSlot);
+          });
 
-    // Palette Selector Handler
-    function setPalette(key) {
-      currentPaletteKey = key;
-      document.querySelectorAll('.palette-btn').forEach(btn => {
-        btn.classList.remove('border-2', 'border-cyan-500', 'bg-cyan-50/50');
-        btn.classList.add('border', 'border-slate-200');
-      });
-      event.currentTarget.classList.add('border-2', 'border-cyan-500', 'bg-cyan-50/50');
-      event.currentTarget.classList.remove('border-slate-200');
-      
-      renderQr();
-      showToast("تم تحديث لون الهوية السنّية");
-    }
+          if (isConflict) {
+            alert(`نعتذر، تم حجز الموعد (${timeSlot}) قبل ثوانٍ من قبل مريض آخر! يرجى اختيار موعد شاغر.`);
+            generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
+            submitBtn.disabled = false;
+            recalculateCapacity();
+            return;
+          }
 
-    function updateCardTexts() {
-      const title = document.getElementById("inputTitle").value.trim() || "عيادة د. سارة لطب وتجميل الأسنان";
-      const subtitle = document.getElementById("inputSubtitle").value.trim() || "Dental & Aesthetic Clinic";
-      const action = document.getElementById("inputAction").value.trim() || "امسح الكود لزيارة موقع العيادة وحجز موعدك";
-      const slogan = document.getElementById("inputSlogan").value.trim();
-      const isSloganVisible = document.getElementById("toggleSlogan").checked;
+          const bookingRecord = {
+            name,
+            phone,
+            type,
+            service,
+            partySize,
+            timeSlot,
+            notes,
+            date: todayStr,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            timeStr: new Date().toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' })
+          };
 
-      document.getElementById("cardTitle").innerText = title;
-      document.getElementById("cardSubtitleText").innerText = subtitle;
-      document.getElementById("cardActionText").innerText = action;
-
-      const sloganContainer = document.getElementById("cardSloganContainer");
-      if (sloganContainer) {
-        if (!isSloganVisible || slogan === "") {
-          sloganContainer.classList.add("hidden");
-        } else {
-          sloganContainer.classList.remove("hidden");
-          document.getElementById("cardSloganText").innerText = slogan;
+          await db.collection('appointments').add(bookingRecord);
         }
+
+        const currentTitle = clinicConfig.doctorName ? `${clinicConfig.doctorGender} ${clinicConfig.doctorName}` : "العيادة";
+        alert(`تم تثبيت موعدك بنجاح في عيادة ${currentTitle}\nالوقت المحجوز: ${timeSlot}`);
+        document.getElementById('bookingForm').reset();
+        document.getElementById('selectedServiceInput').value = 'كشف وفحص ألم طارئ';
+      } catch (err) {
+        console.error("فشل الحجز:", err);
+        alert("حدث خطأ أثناء الاتصال بالخادم، يرجى المحاولة ثانية: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        recalculateCapacity();
       }
     }
 
-    function toggleSloganVisibility() {
-      const isVisible = document.getElementById("toggleSlogan").checked;
-      const input = document.getElementById("inputSlogan");
-      input.disabled = !isVisible;
-      if (!isVisible) {
-        input.classList.add("opacity-50", "bg-slate-100");
-        showToast("تم إخفاء جملة التذييل");
+    function selectDentalService(serviceName, buttonEl) {
+      document.getElementById('selectedServiceInput').value = serviceName;
+      document.querySelectorAll('.service-card').forEach(btn => {
+        btn.classList.remove('border-clinic-600', 'bg-clinic-50', 'text-clinic-800');
+        btn.classList.add('border-slate-200', 'bg-white', 'text-slate-700');
+      });
+      buttonEl.classList.remove('border-slate-200', 'bg-white', 'text-slate-700');
+      buttonEl.classList.add('border-clinic-600', 'bg-clinic-50', 'text-clinic-800');
+    }
+
+    function handlePartySizeChange() {
+      recalculateCapacity();
+    }
+
+    // ==========================================
+    // 6. جدول الحجوزات
+    // ==========================================
+    let currentFilter = 'all';
+
+    function filterAppointmentsTable(filter) {
+      currentFilter = filter;
+      document.getElementById('filterAllBtn').className = filter === 'all' ? 'px-2.5 py-1 rounded-lg bg-clinic-600 text-white font-bold cursor-pointer' : 'px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-semibold cursor-pointer';
+      document.getElementById('filterNewBtn').className = filter === 'new' ? 'px-2.5 py-1 rounded-lg bg-clinic-600 text-white font-bold cursor-pointer' : 'px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-semibold cursor-pointer';
+      document.getElementById('filterFollowBtn').className = filter === 'followup' ? 'px-2.5 py-1 rounded-lg bg-clinic-600 text-white font-bold cursor-pointer' : 'px-2.5 py-1 rounded-lg bg-slate-200 text-slate-700 font-semibold cursor-pointer';
+      renderAppointmentsTable();
+    }
+
+    function renderAppointmentsTable() {
+      const tbody = document.getElementById('appointmentsTableBody');
+      const mobileList = document.getElementById('appointmentsMobileList');
+      const emptyState = document.getElementById('emptyTableState');
+
+      let filtered = todayAppointments;
+      if (currentFilter !== 'all') {
+        filtered = todayAppointments.filter(item => item.type === currentFilter);
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        mobileList.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      emptyState.classList.add('hidden');
+
+      // Desktop Table
+      tbody.innerHTML = filtered.map((item, idx) => `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="py-2.5 px-3 font-bold text-slate-400">${idx + 1}</td>
+          <td class="py-2.5 px-3 font-bold text-slate-900">${item.name}</td>
+          <td class="py-2.5 px-3" dir="ltr"><a href="tel:${item.phone}" class="text-clinic-700 hover:underline font-semibold">${item.phone}</a></td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.type === 'new' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+              ${item.type === 'new' ? 'جديد' : 'مراجعة'}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-600">${item.service}</td>
+          <td class="py-2.5 px-3 text-center font-bold">${item.partySize}</td>
+          <td class="py-2.5 px-3 font-semibold text-clinic-800">${item.timeSlot}</td>
+          <td class="py-2.5 px-3 text-center">
+            <button onclick="cancelAppointment('${item.id}')" class="text-rose-600 hover:text-rose-800 p-1 font-bold text-xs cursor-pointer" title="إلغاء الموعد">✕</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Mobile Cards List
+      mobileList.innerHTML = filtered.map((item, idx) => `
+        <div class="p-3 bg-slate-50 rounded-xl space-y-2 border border-slate-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="font-bold text-xs text-slate-900">${idx + 1}. ${item.name}</span>
+              <span class="px-1.5 py-0.5 rounded-md text-[9px] font-bold ${item.type === 'new' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${item.type === 'new' ? 'جديد' : 'مراجعة'}
+              </span>
+            </div>
+            <button onclick="cancelAppointment('${item.id}')" class="text-rose-600 text-xs font-bold px-2 py-0.5 bg-rose-50 rounded-lg cursor-pointer">إلغاء ✕</button>
+          </div>
+          <div class="text-[11px] text-slate-600 flex items-center justify-between">
+            <span>${item.service}</span>
+            <span class="font-bold text-clinic-700">${item.timeSlot}</span>
+          </div>
+          <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-200">
+            <span dir="ltr">هاتف: ${item.phone}</span>
+            <span>عدد المقاعد: ${item.partySize}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function cancelAppointment(id) {
+      if (!confirm("هل أنت متأكد من رغبتك في إلغاء هذا الموعد وتفريغ مقاعده؟")) return;
+      try {
+        if (db && !id.startsWith('local_')) {
+          await db.collection('appointments').doc(id).delete();
+        } else {
+          todayAppointments = todayAppointments.filter(item => item.id !== id);
+          renderAppointmentsTable();
+          recalculateCapacity();
+          generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
+        }
+      } catch (err) {
+        console.error("خطأ في إلغاء الموعد:", err);
+      }
+    }
+
+    async function resetTodayAppointments() {
+      if (!confirm("تنبيه: هل تريد حقاً تصفير جميع حجوزات اليوم وإعادة السعة بالكامل؟")) return;
+      try {
+        if (db) {
+          const batch = db.batch();
+          todayAppointments.forEach(item => {
+            if (!item.id.startsWith('local_')) {
+              batch.delete(db.collection('appointments').doc(item.id));
+            }
+          });
+          await batch.commit();
+        }
+        todayAppointments = [];
+        renderAppointmentsTable();
+        recalculateCapacity();
+        generateTimeSlots(clinicConfig.startHour, clinicConfig.endHour, clinicConfig.slotDuration);
+      } catch (err) {
+        console.error("فشل التصفير:", err);
+      }
+    }
+
+    async function toggleEmergencyLock() {
+      clinicConfig.clinicManuallyClosed = !clinicConfig.clinicManuallyClosed;
+      const btn = document.getElementById('toggleLockBtn');
+      const text = document.getElementById('lockText');
+      if (clinicConfig.clinicManuallyClosed) {
+        text.textContent = 'إعادة فتح الحجز';
+        btn.className = 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 shadow-sm cursor-pointer';
       } else {
-        input.classList.remove("opacity-50", "bg-slate-100");
-        showToast("تم تفعيل جملة التذييل");
+        text.textContent = 'إيقاف الحجز مؤقتاً';
+        btn.className = 'flex-1 sm:flex-none px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-1.5 bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100 shadow-sm cursor-pointer';
       }
-      updateCardTexts();
+
+      if (db) {
+        await db.collection('clinic_settings').doc('config').update({
+          clinicManuallyClosed: clinicConfig.clinicManuallyClosed
+        }).catch(console.error);
+      }
+      recalculateCapacity();
     }
 
-    function clearSlogan() {
-      document.getElementById("inputSlogan").value = "";
-      document.getElementById("toggleSlogan").checked = false;
-      toggleSloganVisibility();
-      showToast("تم حذف جملة التذييل بنجاح ✕");
-    }
+    // ==========================================
+    // 7. الإشعارات
+    // ==========================================
+    function triggerChimeSound() {
+      if (!isSoundEnabled) return;
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+        
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.5);
 
-    function resetDefaultSlogan() {
-      document.getElementById("inputSlogan").value = "ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨";
-      document.getElementById("toggleSlogan").checked = true;
-      document.getElementById("inputSlogan").disabled = false;
-      document.getElementById("inputSlogan").classList.remove("opacity-50", "bg-slate-100");
-      updateCardTexts();
-      showToast("تمت استعادة الجملة الافتراضية 🦷");
-    }
-
-    function switchPreviewMode(mode) {
-      const standContainer = document.getElementById("standCardContainer");
-      const qrOnlyContainer = document.getElementById("qrOnlyContainer");
-      const tabCard = document.getElementById("tabCardBtn");
-      const tabQr = document.getElementById("tabQrBtn");
-
-      if (mode === 'card') {
-        standContainer.classList.remove('hidden');
-        qrOnlyContainer.classList.add('hidden');
-        tabCard.classList.add('bg-white', 'text-cyan-800', 'shadow-sm');
-        tabCard.classList.remove('text-slate-600');
-        tabQr.classList.remove('bg-white', 'text-cyan-800', 'shadow-sm');
-        tabQr.classList.add('text-slate-600');
-      } else {
-        standContainer.classList.add('hidden');
-        qrOnlyContainer.classList.remove('hidden');
-        tabQr.classList.add('bg-white', 'text-cyan-800', 'shadow-sm');
-        tabQr.classList.remove('text-slate-600');
-        tabCard.classList.remove('bg-white', 'text-cyan-800', 'shadow-sm');
-        tabCard.classList.add('text-slate-600');
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(880, now + 0.15);
+        gain2.gain.setValueAtTime(0.35, now + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.15);
+        osc2.stop(now + 0.8);
+      } catch (e) {
+        console.log("Audio not allowed yet:", e);
       }
     }
 
-    function showToast(message) {
-      const toast = document.getElementById("toast");
-      const msg = document.getElementById("toastMsg");
-      msg.innerText = message;
-      toast.classList.remove("opacity-0", "pointer-events-none");
-      toast.classList.add("opacity-100");
-      setTimeout(() => {
-        toast.classList.remove("opacity-100");
-        toast.classList.add("opacity-0", "pointer-events-none");
-      }, 2500);
+    function toggleSound() {
+      isSoundEnabled = !isSoundEnabled;
+      document.getElementById('soundIcon').textContent = isSoundEnabled ? '🔊' : '🔇';
     }
 
-    function downloadQrOnly(extension) {
-      showToast("جاري تنزيل كود الباركود السنّي...");
-      
-      const fileName = `dental-clinic-${currentQrType}-qr`;
-      if (extension === 'svg') {
-        const svgQr = new QRCodeStyling({
-          ...createQrOptions(1200),
-          type: "svg"
+    function requestSystemNotificationPermission() {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            alert("تم تفعيل إشعارات النظام بنجاح! ستصلك تنبيهات فورية عند كل حجز جديد.");
+            document.getElementById('systemNotifIcon').textContent = '🔔✓';
+          }
         });
-        svgQr.download({ name: fileName, extension: "svg" });
       } else {
-        const hdQr = new QRCodeStyling({
-          ...createQrOptions(2000),
-          type: "canvas"
-        });
-        hdQr.download({ name: `${fileName}-2000px`, extension: "png" });
+        alert("المتصفح لا يدعم إشعارات النظام.");
       }
     }
 
-    // Print-ready Ultra HD Dental Clinic Poster
-    async function downloadHighResPoster() {
-      showToast("جاري إعداد وتصدير لوحة العيادة السنّية الفائقة (300 DPI Ultra HD)...");
+    function triggerSystemNotification(booking) {
+      if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("حجز موعد جديد في العيادة 🦷", {
+          body: `المريض: ${booking.name} (${booking.partySize} مقعد)\nالخدمة: ${booking.service} - ${booking.timeSlot}`,
+          icon: 'https://cdn-icons-png.flaticon.com/512/3063/3063823.png'
+        });
+      }
+    }
 
-      const canvas = document.createElement('canvas');
-      canvas.width = 2400;
-      canvas.height = 3200;
-      const ctx = canvas.getContext('2d');
+    function showDoctorNotificationBanner(booking) {
+      const banner = document.getElementById('doctorIncomingNotification');
+      document.getElementById('latestNotificationText').textContent = `${booking.name} - ${booking.service} (${booking.timeSlot})`;
+      banner.classList.remove('hidden');
+    }
 
-      const palette = PALETTES[currentPaletteKey];
-      const title = document.getElementById("inputTitle").value.trim() || "عيادة د. سارة لطب وتجميل الأسنان";
-      const subtitle = document.getElementById("inputSubtitle").value.trim() || "Dental & Aesthetic Clinic";
-      const actionText = document.getElementById("inputAction").value.trim() || "امسح الكود بهاتفك";
+    function dismissNotificationBanner() {
+      document.getElementById('doctorIncomingNotification').classList.add('hidden');
+    }
 
-      // 1. Elegant Pearly Dental Background
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, 3200);
-      bgGrad.addColorStop(0, '#ffffff');
-      bgGrad.addColorStop(0.5, '#f8fafc');
-      bgGrad.addColorStop(1, '#ecfeff');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, 2400, 3200);
+    // ==========================================
+    // 8. التنقل في شاشات الطبيب
+    // ==========================================
+    function switchDoctorView(viewName) {
+      document.getElementById('viewPatient').classList.add('hidden');
+      if (viewName === 'dashboard') {
+        document.getElementById('viewDoctorDashboard').classList.remove('hidden');
+        document.getElementById('viewDoctorAnalytics').classList.add('hidden');
+        setTabActiveVisual('tabDoctorLive');
+      } else if (viewName === 'analytics') {
+        document.getElementById('viewDoctorDashboard').classList.add('hidden');
+        document.getElementById('viewDoctorAnalytics').classList.remove('hidden');
+        setTabActiveVisual('tabDoctorAnalytics');
+        calculateAndRenderAnalytics();
+      }
+    }
 
-      // Frame Border with Dental Clinic Colors
-      ctx.strokeStyle = palette.cornerSquareColor;
-      ctx.lineWidth = 22;
-      ctx.strokeRect(60, 60, 2280, 3080);
+    function setTabActiveVisual(activeTabId) {
+      const tabs = ['tabDoctorLive', 'tabDoctorAnalytics'];
+      tabs.forEach(tabId => {
+        const btn = document.getElementById(tabId);
+        if (tabId === activeTabId) {
+          btn.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all bg-white text-clinic-700 shadow-sm border border-slate-200 text-center relative cursor-pointer";
+        } else {
+          btn.className = "flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900 border border-transparent text-center relative cursor-pointer";
+        }
+      });
+    }
 
-      // Inner thin cyan border
-      ctx.strokeStyle = '#cffafe';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(88, 88, 2224, 3024);
+    // ==========================================
+    // 9. بوابة تسجيل الطبيب / استعادة كلمة المرور
+    // ==========================================
+    function openDoctorAuthModal() {
+      document.getElementById('doctorAuthModal').classList.remove('hidden');
+      backToLoginFromForgot();
+    }
 
-      // 2. Corner Dental Watermarks
-      ctx.save();
-      ctx.font = '100px sans-serif';
-      ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
-      ctx.fillText('🦷', 140, 220);
-      ctx.fillText('🦷', 2180, 220);
-      ctx.fillText('🦷', 140, 3040);
-      ctx.fillText('🦷', 2180, 3040);
-      ctx.restore();
+    function closeDoctorAuthModal() {
+      document.getElementById('doctorAuthModal').classList.add('hidden');
+      document.getElementById('authErrorMessage').classList.add('hidden');
+      document.getElementById('authSuccessMessage').classList.add('hidden');
+    }
 
-      // 3. Top Dental Emblem Badge
-      const emblemY = 360;
-      ctx.save();
-      ctx.shadowColor = 'rgba(8, 145, 178, 0.28)';
-      ctx.shadowBlur = 40;
-      ctx.shadowOffsetY = 15;
-      
-      const badgeGrad = ctx.createLinearGradient(1200 - 120, emblemY - 120, 1200 + 120, emblemY + 120);
-      badgeGrad.addColorStop(0, palette.gradientStart);
-      badgeGrad.addColorStop(1, palette.gradientEnd);
-      ctx.fillStyle = badgeGrad;
-      
-      const rx = 1200 - 120, ry = emblemY - 120, rw = 240, rh = 240, radius = 50;
-      ctx.beginPath();
-      ctx.moveTo(rx + radius, ry);
-      ctx.lineTo(rx + rw - radius, ry);
-      ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
-      ctx.lineTo(rx + rw, ry + rh - radius);
-      ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
-      ctx.lineTo(rx + radius, ry + rh);
-      ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
-      ctx.lineTo(rx, ry + radius);
-      ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
+    function switchAuthTab(mode) {
+      authTabMode = mode;
+      const tabLogin = document.getElementById('authTabLogin');
+      const tabRegister = document.getElementById('authTabRegister');
+      const submitBtn = document.getElementById('authSubmitBtn');
+      document.getElementById('authErrorMessage').classList.add('hidden');
+      document.getElementById('authSuccessMessage').classList.add('hidden');
 
-      // Draw Selected Dental Icon into emblem
-      const emblemImg = new Image();
-      emblemImg.src = getSelectedIconUrl();
-      await new Promise(r => { emblemImg.onload = r; });
-      ctx.drawImage(emblemImg, 1200 - 75, emblemY - 75, 150, 150);
+      if (mode === 'login') {
+        tabLogin.className = "flex-1 py-2 rounded-lg bg-white text-clinic-700 shadow-sm transition-all cursor-pointer";
+        tabRegister.className = "flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer";
+        submitBtn.textContent = "دخول للعيادة";
+      } else {
+        tabRegister.className = "flex-1 py-2 rounded-lg bg-white text-clinic-700 shadow-sm transition-all cursor-pointer";
+        tabLogin.className = "flex-1 py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer";
+        submitBtn.textContent = "إنشاء حساب طبيب جديد";
+      }
+    }
 
-      // 4. Titles & Dental Subtitle
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#0f172a';
-      ctx.font = 'bold 88px Cairo, sans-serif';
-      ctx.fillText(title, 1200, 700);
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = 'إخفاء';
+      } else {
+        input.type = 'password';
+        btn.textContent = 'إظهار';
+      }
+    }
 
-      ctx.fillStyle = palette.gradientStart;
-      ctx.font = '600 46px Cairo, sans-serif';
-      ctx.fillText(`🦷  ${subtitle}  ✨`, 1200, 785);
+    function showForgotPasswordPrompt() {
+      document.getElementById('doctorAuthForm').classList.add('hidden');
+      document.getElementById('authTabsContainer').classList.add('hidden');
+      document.getElementById('forgotPasswordView').classList.remove('hidden');
+      document.getElementById('authModalHeaderTitle').textContent = 'استعادة كلمة المرور';
+      document.getElementById('authModalHeaderDesc').textContent = 'أدخل بريدك الإلكتروني لإرسال رابط الاستعادة.';
 
-      // Divider line
-      const lineGrad = ctx.createLinearGradient(850, 835, 1550, 835);
-      lineGrad.addColorStop(0, 'rgba(6, 182, 212, 0)');
-      lineGrad.addColorStop(0.5, palette.gradientStart);
-      lineGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
-      ctx.strokeStyle = lineGrad;
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.moveTo(850, 835);
-      ctx.lineTo(1550, 835);
-      ctx.stroke();
+      const existingEmail = document.getElementById('doctorAuthEmail').value.trim();
+      const resetInput = document.getElementById('doctorResetEmail');
+      if (existingEmail) {
+        resetInput.value = existingEmail;
+      }
+      resetInput.focus();
+    }
 
-      // 5. Generate and Draw 1350px Dental QR Code
-      const qrCanvasSize = 1350;
-      const hdQrGenerator = new QRCodeStyling({
-        ...createQrOptions(qrCanvasSize),
-        type: "canvas"
+    function backToLoginFromForgot() {
+      document.getElementById('doctorAuthForm').classList.remove('hidden');
+      document.getElementById('authTabsContainer').classList.remove('hidden');
+      document.getElementById('forgotPasswordView').classList.add('hidden');
+      document.getElementById('authModalHeaderTitle').textContent = 'بوابة إدارة العيادة';
+      document.getElementById('authModalHeaderDesc').textContent = 'تسجيل الدخول بالبريد الإلكتروني للوصول إلى لوحة المواعيد.';
+    }
+
+    async function sendPasswordResetRequest() {
+      const email = document.getElementById('doctorResetEmail').value.trim();
+      const btn = document.getElementById('sendResetBtn');
+
+      if (!email) {
+        alert("يرجى كتابة البريد الإلكتروني أولاً في الحقل المخصص.");
+        document.getElementById('doctorResetEmail').focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "جاري الإرسال...";
+
+      try {
+        if (!auth) throw new Error("نظام المصادقة غير متصل بالسحابة حالياً.");
+        await auth.sendPasswordResetEmail(email);
+        alert(`تم إرسال رابط تعيين كلمة المرور بنجاح إلى:\n${email}\n\nيرجى مراجعة صندوق الوارد لديك (أو مجلد الرسائل غير المرغوب فيها Spam).`);
+        backToLoginFromForgot();
+      } catch (err) {
+        alert("تعذر إرسال الرابط: " + (err.message || "تأكد من صحة البريد الإلكتروني المسجل"));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "إرسال رابط تعيين كلمة المرور";
+      }
+    }
+
+    async function handleDoctorAuthSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('doctorAuthEmail').value.trim();
+      const password = document.getElementById('doctorAuthPassword').value;
+      const errorEl = document.getElementById('authErrorMessage');
+      const submitBtn = document.getElementById('authSubmitBtn');
+
+      errorEl.classList.add('hidden');
+      submitBtn.disabled = true;
+
+      try {
+        if (authTabMode === 'login') {
+          await auth.signInWithEmailAndPassword(email, password);
+        } else {
+          await auth.createUserWithEmailAndPassword(email, password);
+        }
+        closeDoctorAuthModal();
+      } catch (err) {
+        errorEl.classList.remove('hidden');
+        errorEl.textContent = "خطأ: " + (err.message || "فشل التحقق من البريد أو كلمة المرور");
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function handleDoctorLogout() {
+      if (confirm("هل تريد تسجيل الخروج والعودة لواجهة المرضى؟")) {
+        if (auth) await auth.signOut();
+      }
+    }
+
+    // ==========================================
+    // 10. إعدادات العيادة
+    // ==========================================
+    function openClinicSettingsModal() {
+      document.getElementById('settingDoctorGender').value = clinicConfig.doctorGender || "دكتورة";
+      document.getElementById('settingDoctorName').value = clinicConfig.doctorName || "";
+      document.getElementById('settingSpecialty').value = clinicConfig.specialty || "جراحة وزراعة وتجميل الأسنان";
+      document.getElementById('settingStartHour').value = clinicConfig.startHour || "10:30";
+      document.getElementById('settingEndHour').value = clinicConfig.endHour || "20:30";
+      document.getElementById('settingScheduleNotes').value = clinicConfig.scheduleNotes || "";
+      document.getElementById('settingMaxCapacity').value = clinicConfig.maxDailyCapacity || 15;
+      document.getElementById('settingSlotDuration').value = clinicConfig.slotDuration || 45;
+      document.getElementById('settingAddress').value = clinicConfig.address || "";
+      document.getElementById('settingPhone').value = clinicConfig.phone || "";
+      document.getElementById('settingShowRemainingSeats').checked = clinicConfig.showRemainingSeatsToPatients !== false;
+
+      document.querySelectorAll('input[name="workDaySetting"]').forEach(cb => {
+        cb.checked = (clinicConfig.workDays || []).includes(cb.value);
       });
 
-      const rawBlob = await hdQrGenerator.getRawData("png");
-      const qrBlobUrl = URL.createObjectURL(rawBlob);
-      const qrImage = new Image();
-      qrImage.src = qrBlobUrl;
-      await new Promise(r => { qrImage.onload = r; });
+      document.getElementById('clinicSettingsModal').classList.remove('hidden');
+    }
 
-      // QR Frame Container
-      const qrBoxX = 1200 - (qrCanvasSize / 2) - 60;
-      const qrBoxY = 940;
-      const qrBoxW = qrCanvasSize + 120;
-      const qrBoxH = qrCanvasSize + 120;
+    function closeClinicSettingsModal() {
+      document.getElementById('clinicSettingsModal').classList.add('hidden');
+    }
 
-      ctx.save();
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.07)';
-      ctx.shadowBlur = 45;
-      ctx.shadowOffsetY = 18;
-      ctx.fillStyle = '#ffffff';
+    async function saveClinicSettings(event) {
+      event.preventDefault();
+
+      const selectedDays = Array.from(document.querySelectorAll('input[name="workDaySetting"]:checked')).map(cb => cb.value);
+
+      const updated = {
+        doctorGender: document.getElementById('settingDoctorGender').value,
+        doctorName: document.getElementById('settingDoctorName').value.trim(),
+        specialty: document.getElementById('settingSpecialty').value.trim(),
+        startHour: document.getElementById('settingStartHour').value,
+        endHour: document.getElementById('settingEndHour').value,
+        scheduleNotes: document.getElementById('settingScheduleNotes').value.trim(),
+        workDays: selectedDays,
+        maxDailyCapacity: Number(document.getElementById('settingMaxCapacity').value) || 15,
+        slotDuration: Number(document.getElementById('settingSlotDuration').value) || 45,
+        showRemainingSeatsToPatients: document.getElementById('settingShowRemainingSeats').checked,
+        address: document.getElementById('settingAddress').value.trim(),
+        phone: document.getElementById('settingPhone').value.trim()
+      };
+
+      try {
+        if (db) {
+          await db.collection('clinic_settings').doc('config').set(updated, { merge: true });
+        }
+        clinicConfig = { ...clinicConfig, ...updated };
+        try {
+          localStorage.setItem('clinic_profile_cache_safaa', JSON.stringify(clinicConfig));
+        } catch(e) {}
+        applySettingsToUI(clinicConfig);
+        closeClinicSettingsModal();
+        alert("تم حفظ إعدادات العيادة بنجاح ومزامنتها لحظياً مع كافة أجهزة المرضى!");
+      } catch (err) {
+        alert("فشل حفظ الإعدادات: " + err.message);
+      }
+    }
+
+    // ==========================================
+    // 11. مركز الإحصائيات الشاملة وتصدير PDF
+    // ==========================================
+    let analyticsTimeframe = 'week';
+
+    function setAnalyticsTimeframe(timeframe) {
+      analyticsTimeframe = timeframe;
+      ['week', 'month', 'all'].forEach(t => {
+        const btn = document.getElementById(`timeframe${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+        if (t === timeframe) {
+          btn.className = "px-2.5 py-1 rounded-lg bg-white text-clinic-700 shadow-sm transition-all cursor-pointer";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg text-slate-600 hover:text-slate-900 transition-all cursor-pointer";
+        }
+      });
+      calculateAndRenderAnalytics();
+    }
+
+    function calculateAndRenderAnalytics() {
+      const data = todayAppointments;
+      const total = data.length;
+      const newCount = data.filter(a => a.type === 'new').length;
+      const followCount = data.filter(a => a.type === 'followup').length;
+
+      document.getElementById('analyticsTotalBookings').textContent = total;
+      document.getElementById('analyticsNewCount').textContent = `${newCount} مريض جديد`;
+      document.getElementById('analyticsFollowupCount').textContent = `${followCount} مراجعة`;
+
+      const newRatio = total > 0 ? Math.round((newCount / total) * 100) : 0;
+      const followRatio = total > 0 ? Math.round((followCount / total) * 100) : 0;
+      document.getElementById('analyticsNewRatio').textContent = `${newRatio}%`;
+      document.getElementById('analyticsFollowupRatio').textContent = `${followRatio}%`;
+
+      const bookedSeats = data.reduce((s, i) => s + (Number(i.partySize) || 1), 0);
+      const capRate = Math.min(100, Math.round((bookedSeats / (Number(clinicConfig.maxDailyCapacity) || 15)) * 100));
+      document.getElementById('analyticsUtilizationRate').textContent = `${capRate}%`;
+
+      const servicesMap = {};
+      data.forEach(item => {
+        servicesMap[item.service] = (servicesMap[item.service] || 0) + 1;
+      });
+
+      const servContainer = document.getElementById('servicesBarsContainer');
+      document.getElementById('servicesChartTotalBadge').textContent = `${total} حالة`;
       
-      const bRad = 60;
-      ctx.beginPath();
-      ctx.moveTo(qrBoxX + bRad, qrBoxY);
-      ctx.lineTo(qrBoxX + qrBoxW - bRad, qrBoxY);
-      ctx.quadraticCurveTo(qrBoxX + qrBoxW, qrBoxY, qrBoxX + qrBoxW, qrBoxY + bRad);
-      ctx.lineTo(qrBoxX + qrBoxW, qrBoxY + qrBoxH - bRad);
-      ctx.quadraticCurveTo(qrBoxX + qrBoxW, qrBoxY + qrBoxH, qrBoxX + qrBoxW - bRad, qrBoxY + qrBoxH);
-      ctx.lineTo(qrBoxX + bRad, qrBoxY + qrBoxH);
-      ctx.quadraticCurveTo(qrBoxX, qrBoxY + qrBoxH, qrBoxX, qrBoxY + qrBoxH - bRad);
-      ctx.lineTo(qrBoxX, qrBoxY + bRad);
-      ctx.quadraticCurveTo(qrBoxX, qrBoxY, qrBoxX + bRad, qrBoxY);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.strokeStyle = '#cffafe';
-      ctx.lineWidth = 8;
-      ctx.stroke();
-      ctx.restore();
-
-      // Draw QR itself
-      ctx.drawImage(qrImage, 1200 - (qrCanvasSize / 2), 940 + 60, qrCanvasSize, qrCanvasSize);
-      URL.revokeObjectURL(qrBlobUrl);
-
-      // 6. Action Call & Instructions
-      const pillY = 2560;
-      ctx.fillStyle = '#ecfeff';
-      const pillW = 1000, pillH = 90, pillX = 1200 - 500;
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(pillX, pillY, pillW, pillH, 45) : ctx.rect(pillX, pillY, pillW, pillH);
-      ctx.fill();
-      ctx.strokeStyle = '#a5f3fc';
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      ctx.fillStyle = palette.gradientStart;
-      ctx.font = 'bold 42px Cairo, sans-serif';
-      
-      let badgeLabel = "🦷✨ وجّه كاميرا الهاتف نحو الكود للمسح السريع";
-      if (currentQrType === 'wifi') badgeLabel = "🦷📶 اتصال مباشر بشبكة واي فاي صالة انتظار العيادة";
-      else if (currentQrType === 'whatsapp') badgeLabel = "🦷💬 محادثة واتساب فورية لحجز كشف وطوارئ الأسنان";
-      else if (currentQrType === 'vcard') badgeLabel = "🦷🪪 حفظ جهة اتصال طبيب الأسنان في هاتفك";
-
-      ctx.fillText(badgeLabel, 1200, pillY + 58);
-
-      // Wi-Fi Details Box if active
-      if (currentQrType === 'wifi') {
-        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
-        const pass = document.getElementById("inputWifiPassword").value || "";
-        ctx.fillStyle = '#0e7490';
-        ctx.font = 'bold 46px sans-serif';
-        ctx.fillText(`Wi-Fi: ${ssid}   |   Password: ${pass}`, 1200, 2740);
-        ctx.fillStyle = '#64748b';
-        ctx.font = '500 38px Cairo, sans-serif';
-        ctx.fillText(actionText, 1200, 2820);
+      if (total === 0) {
+        servContainer.innerHTML = `<div class="text-xs text-slate-400 py-4 text-center">لا توجد سجلات كافية للتحليل</div>`;
       } else {
-        ctx.fillStyle = '#475569';
-        ctx.font = '500 40px Cairo, sans-serif';
-        ctx.fillText(actionText, 1200, 2760);
+        servContainer.innerHTML = Object.entries(servicesMap).map(([service, count]) => {
+          const p = Math.round((count / total) * 100);
+          return `
+            <div>
+              <div class="flex justify-between text-[11px] mb-1">
+                <span class="font-bold text-slate-700">${service}</span>
+                <span class="text-slate-500">${count} حالة (${p}%)</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="bg-clinic-600 h-2 rounded-full" style="width: ${p}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
 
-      // 7. Dental Footer Slogan
-      const slogan = document.getElementById("inputSlogan").value.trim();
-      const isSloganVisible = document.getElementById("toggleSlogan").checked;
+      const daysContainer = document.getElementById('daysBarsContainer');
+      const daysOrder = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
+      daysContainer.innerHTML = daysOrder.map(day => `
+        <div>
+          <div class="flex justify-between text-[11px] mb-1">
+            <span class="font-bold text-slate-700">${day}</span>
+            <span class="text-slate-400">نشط</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div class="bg-teal-500 h-2 rounded-full" style="width: ${Math.floor(Math.random() * 60) + 30}%"></div>
+          </div>
+        </div>
+      `).join('');
+    }
 
-      if (isSloganVisible && slogan !== "") {
-        ctx.fillStyle = '#0891b2';
-        ctx.font = 'bold 36px Cairo, sans-serif';
-        ctx.fillText(slogan, 1200, 2960);
+    function loadAnalyticsDemoData() {
+      const demoServices = [
+        'كشف وفحص ألم طارئ',
+        'علاج عصب وحشوات تجميلية',
+        'تنظيف وتلميع وتبييض الأسنان',
+        'تقويم الأسنان واستشارة',
+        'خلع وجراحة فموية',
+        'زراعة وتركيبات وتلبيس (Zircon)'
+      ];
+      const demoNames = ['أحمد السالم', 'مريم الحلبي', 'عمر الباشا', 'سارة المصري', 'خالد النجار', 'رنا الكردي', 'ياسين العطار'];
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 32px sans-serif';
-        ctx.fillText("Doctor.S Dental Clinic • https://nurse9sy-cyber.github.io/Doctor.S/", 1200, 3020);
+      todayAppointments = demoNames.map((name, i) => ({
+        id: 'demo_' + i,
+        name,
+        phone: '09' + Math.floor(10000000 + Math.random() * 90000000),
+        type: i % 2 === 0 ? 'new' : 'followup',
+        service: demoServices[i % demoServices.length],
+        partySize: 1,
+        timeSlot: `${12 + i}:00 مساءً`,
+        date: new Date().toISOString().split('T')[0]
+      }));
+
+      renderAppointmentsTable();
+      recalculateCapacity();
+      calculateAndRenderAnalytics();
+      alert("تم توليد بيانات تجريبية لمعاينة الإحصائيات وطباعة التقرير!");
+    }
+
+    function printOrExportPdfReport() {
+      const cfg = clinicConfig || {};
+      const docName = (cfg.doctorName && cfg.doctorName.trim() !== '') ? `${cfg.doctorGender || 'د.'} ${cfg.doctorName}` : "عيادة طب الأسنان";
+      document.getElementById('pdfDoctorName').textContent = `عيادة ${docName}`;
+      document.getElementById('pdfSpecialty').textContent = cfg.specialty || 'جراحة وزراعة وتجميل الأسنان';
+      document.getElementById('pdfClinicInfo').textContent = `المقر: ${cfg.address || 'المقر المعتمد'} | هاتف: ${cfg.phone || '---'}`;
+      
+      const now = new Date();
+      document.getElementById('pdfPrintDate').textContent = now.toLocaleDateString('ar-SY') + ' - ' + now.toLocaleTimeString('ar-SY', { hour: '2-digit', minute: '2-digit' });
+
+      const data = todayAppointments;
+      const total = data.length;
+      const newCount = data.filter(a => a.type === 'new').length;
+      const followCount = data.filter(a => a.type === 'followup').length;
+      const bookedSeats = data.reduce((sum, item) => sum + (Number(item.partySize) || 1), 0);
+      const maxCap = Number(cfg.maxDailyCapacity) || 15;
+      const utilRate = Math.min(100, Math.round((bookedSeats / maxCap) * 100));
+
+      document.getElementById('pdfMaxCap').textContent = maxCap;
+      document.getElementById('pdfTotalPatients').textContent = total;
+      document.getElementById('pdfNewPatients').textContent = newCount;
+      document.getElementById('pdfFollowupPatients').textContent = followCount;
+      document.getElementById('pdfBookedSeats').textContent = bookedSeats;
+      document.getElementById('pdfUtilization').textContent = `${utilRate}%`;
+
+      const patientsTbody = document.getElementById('pdfPatientsTableBody');
+      if (data.length === 0) {
+        patientsTbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 20px; color: #64748b; font-size: 11px;">
+              لا توجد مواعيد مسجلة في جدول العيادة اليوم.
+            </td>
+          </tr>
+        `;
       } else {
-        // Center brand info gracefully when slogan is removed/deleted
-        ctx.fillStyle = '#0891b2';
-        ctx.font = 'bold 36px Cairo, sans-serif';
-        ctx.fillText("Doctor.S Dental Clinic", 1200, 2975);
-
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 30px sans-serif';
-        ctx.fillText("https://nurse9sy-cyber.github.io/Doctor.S/", 1200, 3030);
+        patientsTbody.innerHTML = data.map((item, idx) => {
+          const bg = (idx % 2 === 0) ? '#ffffff' : '#f8fafc';
+          return `
+            <tr style="background-color: ${bg}; border-bottom: 1px solid #e2e8f0;">
+              <td style="padding: 6px 4px; text-align: center; font-weight: bold; border: 1px solid #cbd5e1;">${idx + 1}</td>
+              <td style="padding: 6px 8px; font-weight: 800; border: 1px solid #cbd5e1;">${item.name}</td>
+              <td style="padding: 6px 8px; font-family: monospace; border: 1px solid #cbd5e1;" dir="ltr">${item.phone}</td>
+              <td style="padding: 6px 6px; text-align: center; border: 1px solid #cbd5e1;">${item.type === 'new' ? 'جديد' : 'مراجعة'}</td>
+              <td style="padding: 6px 8px; font-weight: 600; color: #0f766e; border: 1px solid #cbd5e1;">${item.service}</td>
+              <td style="padding: 6px 6px; text-align: center; border: 1px solid #cbd5e1;">${item.timeSlot}</td>
+              <td style="padding: 6px 4px; text-align: center; font-weight: bold; border: 1px solid #cbd5e1;">${item.partySize}</td>
+              <td style="padding: 6px 8px; color: #475569; border: 1px solid #cbd5e1;">${item.notes || '---'}</td>
+            </tr>
+          `;
+        }).join('');
       }
 
-      const link = document.createElement('a');
-      link.download = `dental-clinic-${currentQrType}-poster-300dpi.png`;
-      link.href = canvas.toDataURL('image/png', 1.0);
+      setTimeout(() => {
+        window.print();
+      }, 150);
+    }
+
+    function exportAnalyticsCsv() {
+      let csvContent = "\uFEFFاسم المريض,رقم الهاتف,نوع الزيارة,الخدمة المطلوبة,عدد المقاعد,الموعد,التاريخ\n";
+      todayAppointments.forEach(item => {
+        csvContent += `"${item.name}","${item.phone}","${item.type === 'new' ? 'جديد' : 'مراجعة'}","${item.service}","${item.partySize}","${item.timeSlot}","${item.date || ''}"\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `تقرير_حجوزات_العيادة_${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast("تم تنزيل لوحة عيادة الأسنان بدقة 300DPI بنجاح! 🦷");
     }
 
-    // Initialize on window load
+    // ==========================================
+    // 12. انطلاق التطبيق
+    // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
-      renderQr();
+      listenToClinicSettingsRealtime();
+      listenToAppointmentsRealtime();
     });
   </script>
 </body>
