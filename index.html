@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مولّد الباركود الاحترافي لعيادة الأسنان</title>
+  <!-- Google Fonts: Cairo & Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- qr-code-styling for premium styled QR codes with embedded center icon -->
+  <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif'],
+            tajawal: ['Tajawal', 'sans-serif'],
+          },
+          colors: {
+            dental: {
+              50: '#ecfeff',
+              100: '#cffafe',
+              200: '#a5f3fc',
+              300: '#67e8f9',
+              400: '#22d3ee',
+              500: '#06b6d4',
+              600: '#0891b2',
+              700: '#0e7490',
+              800: '#155e75',
+              900: '#164e63',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Cairo', 'Tajawal', sans-serif;
+    }
+    .tooth-pattern {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#0891b2 0.75px, transparent 0.75px), radial-gradient(#06b6d4 0.75px, #f8fafc 0.75px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      background-opacity: 0.05;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(207, 250, 254, 0.8);
+    }
+    .glow-cyan {
+      box-shadow: 0 10px 35px -5px rgba(6, 182, 212, 0.25);
+    }
+    @keyframes pulseSoft {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.03); opacity: 0.9; }
+    }
+    .pulse-soft {
+      animation: pulseSoft 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen tooth-pattern antialiased selection:bg-cyan-500 selection:text-white">
+
+  <header class="bg-gradient-to-r from-cyan-900 via-teal-800 to-cyan-900 text-white shadow-lg sticky top-0 z-50 border-b border-cyan-700/50">
+    <div class="max-w-6xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center p-2 backdrop-blur-md border border-white/20 shadow-inner">
+          <!-- Dental Tooth SVG Icon -->
+          <svg viewBox="0 0 24 24" class="w-full h-full fill-cyan-300" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
+            <span>نظام الباركود الطبي لعيادات الأسنان</span>
+            <span class="text-[10px] bg-cyan-500/30 text-cyan-200 px-2 py-0.5 rounded-full border border-cyan-400/40">هوية سنّية موحدة</span>
+          </h1>
+          <p class="text-xs text-cyan-200">تصميم كود استجابة موحّد بطابع الأسنان مخصص لغرفة الانتظار والمطبوعات الطبية</p>
+        </div>
+      </div>
+      <div class="hidden sm:flex items-center gap-2 text-xs bg-white/10 px-3 py-1.5 rounded-full border border-white/20">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="font-medium text-emerald-100">طابع أسنان احترافي 🦷</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    
+    <!-- Link Overview Banner -->
+    <div class="mb-8 p-4 sm:p-5 bg-gradient-to-l from-cyan-50 via-teal-50 to-white rounded-2xl border border-cyan-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full md:w-auto">
+        <div id="bannerTypeIcon" class="w-10 h-10 rounded-xl bg-cyan-600 text-white flex items-center justify-center shrink-0 shadow-md">
+          <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
+        </div>
+        <div class="overflow-hidden">
+          <span id="bannerTypeLabel" class="text-xs font-bold uppercase tracking-wider text-cyan-700 block">بيانات كود عيادة الأسنان</span>
+          <span id="urlDisplay" class="text-sm sm:text-base font-semibold text-slate-800 truncate block font-mono" dir="ltr">
+            https://nurse9sy-cyber.github.io/Doctor.S/
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+        <button onclick="copyClinicData()" class="px-3 py-2 text-xs font-semibold text-cyan-800 bg-cyan-100 hover:bg-cyan-200 rounded-lg transition-colors flex items-center gap-1.5 active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <span id="btnCopyLabel">نسخ المحتوى</span>
+        </button>
+        <button id="btnActionTest" onclick="testQrAction()" class="px-3 py-2 text-xs font-semibold text-white bg-cyan-700 hover:bg-cyan-800 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span id="btnActionLabel">معاينة الرابط</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      <!-- Right/Main Column: Visual Display & High-Res Stand Card Preview -->
+      <div class="lg:col-span-6 flex flex-col items-center">
+        
+        <!-- Tab selector for preview mode -->
+        <div class="flex items-center gap-2 p-1.5 bg-slate-200/80 rounded-2xl mb-4 w-full max-w-md shadow-inner">
+          <button id="tabCardBtn" onclick="switchPreviewMode('card')" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all bg-white text-cyan-800 shadow-sm flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            بطاقة العيادة الجاهزة للطباعة
+          </button>
+          <button id="tabQrBtn" onclick="switchPreviewMode('qr')" class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            الباركود السنّي فقط (مستقل)
+          </button>
+        </div>
+
+        <div id="standCardContainer" class="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border-4 border-cyan-100 transition-all duration-300 glow-cyan relative overflow-hidden text-center">
+          
+          <!-- Decorative Dental Clinic Top & Bottom Watermark Teeth -->
+          <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-100/60 rounded-full flex items-center justify-center pointer-events-none">
+            <svg class="w-16 h-16 fill-cyan-400/20" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
+          </div>
+          <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-teal-100/60 rounded-full flex items-center justify-center pointer-events-none">
+            <svg class="w-16 h-16 fill-teal-400/20" viewBox="0 0 24 24"><path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2Z"/></svg>
+          </div>
+          
+          <!-- Clinic Header Badge -->
+          <div class="relative z-10 flex flex-col items-center mb-4">
+            <div id="cardEmblem" class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-500 text-white flex items-center justify-center p-3 shadow-lg mb-3 border-2 border-white">
+              <div id="cardEmblemInner" class="w-full h-full flex items-center justify-center">
+                <!-- Injected Tooth Emblem -->
+              </div>
+            </div>
+            <h2 id="cardTitle" class="text-xl sm:text-2xl font-black text-slate-900 leading-snug">عيادة د. سارة لطب وتجميل الأسنان</h2>
+            <p id="cardSubtitle" class="text-xs sm:text-sm text-cyan-700 font-semibold mt-1 flex items-center gap-1.5 justify-center">
+              <span>🦷</span>
+              <span id="cardSubtitleText">Dental & Aesthetic Clinic</span>
+              <span>✨</span>
+            </p>
+            <div class="w-20 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mt-2"></div>
+          </div>
+
+          <!-- QR Code Frame & Canvas Container -->
+          <div class="relative z-10 flex justify-center items-center my-4">
+            <div class="p-3.5 bg-gradient-to-tr from-cyan-50 to-slate-50 rounded-2xl border-2 border-cyan-200/90 shadow-md relative">
+              <!-- Small tooth corner markers -->
+              <span class="absolute top-1 right-1 text-[10px] opacity-40">🦷</span>
+              <span class="absolute bottom-1 left-1 text-[10px] opacity-40">🦷</span>
+              <div id="qrCodeDiv" class="flex justify-center items-center"></div>
+            </div>
+          </div>
+
+          <!-- Scan instruction & Call to action -->
+          <div class="relative z-10 mt-3">
+            <div id="cardBadge" class="inline-flex items-center gap-1.5 bg-cyan-50 px-3.5 py-1.5 rounded-full border border-cyan-200 text-cyan-800 text-xs font-bold mb-2 shadow-xs">
+              <span id="cardBadgeIcon">🦷</span>
+              <span id="cardBadgeText">وجّه كاميرا هاتفك للمسح السريع</span>
+            </div>
+            <p id="cardActionText" class="text-xs text-slate-600 font-medium leading-relaxed">امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك</p>
+            
+            <!-- Dedicated Wi-Fi Details Tag (shown when Wi-Fi is active) -->
+            <div id="wifiDetailsBadge" class="hidden mt-3 p-2.5 bg-cyan-50/70 rounded-xl text-xs text-slate-700 font-medium border border-cyan-200">
+              <div class="flex items-center justify-center gap-2 mb-1 text-cyan-900 font-bold">
+                <span>🦷📶</span>
+                <span>واي فاي صالة انتظار مرضى العيادة</span>
+              </div>
+              <div class="flex items-center justify-center gap-3 text-[11px]">
+                <span><strong class="text-cyan-800">الشبكة:</strong> <span id="cardWifiName" class="font-mono">Clinic_Guest</span></span>
+                <span>•</span>
+                <span><strong class="text-cyan-800">الرمز:</strong> <span id="cardWifiPass" class="font-mono bg-white px-1.5 py-0.5 rounded border border-cyan-200">Clinic@2026</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Footer details in Card -->
+          <div class="relative z-10 mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500 font-medium">
+            <span id="cardSloganContainer" class="flex items-center gap-1.5 overflow-hidden">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 shrink-0"></span>
+              <span id="cardSloganText" class="truncate">ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨</span>
+            </span>
+            <span class="font-mono text-cyan-800 font-semibold shrink-0 mr-auto" dir="ltr">Doctor.S Clinic</span>
+          </div>
+        </div>
+
+        <!-- Standalone QR Code Direct View Container (Hidden initially) -->
+        <div id="qrOnlyContainer" class="hidden w-full max-w-md bg-white rounded-3xl p-8 shadow-xl border border-slate-200 flex flex-col items-center">
+          <div class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-4">
+            <span class="text-base">🦷</span>
+            <span>الباركود السنّي المستقل بدقة نقية للطباعة</span>
+          </div>
+          <div id="qrStandaloneClone" class="p-4 bg-white rounded-2xl border-2 border-cyan-100 shadow-md"></div>
+          <p class="text-xs text-slate-500 mt-4 text-center">يمتلك الباركود هوية سنّية مدمجة في القلب، ويعمل على جميع هواتف الآيفون والأندرويد بدقة فائقة.</p>
+        </div>
+
+        <div class="w-full max-w-md mt-6 space-y-3">
+          <!-- Primary: High-Resolution Poster Card (PNG 2400x3200 Print-Ready) -->
+          <button onclick="downloadHighResPoster()" class="w-full py-3.5 px-5 bg-gradient-to-r from-cyan-700 via-teal-600 to-cyan-800 hover:from-cyan-800 hover:to-teal-900 text-white rounded-2xl font-bold shadow-lg shadow-cyan-700/30 flex items-center justify-center gap-2 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-sm sm:text-base">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>تحميل بطاقة العيادة كاملة للطباعة (Ultra HD 300DPI)</span>
+          </button>
+
+          <!-- Secondary Row: Pure QR Image Downloads -->
+          <div class="grid grid-cols-2 gap-3">
+            <button onclick="downloadQrOnly('png')" class="py-2.5 px-4 bg-white hover:bg-cyan-50 border border-cyan-200 text-cyan-900 rounded-xl font-bold shadow-sm transition-all text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
+              <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>تحميل كود PNG (2000px)</span>
+            </button>
+            <button onclick="downloadQrOnly('svg')" class="py-2.5 px-4 bg-white hover:bg-cyan-50 border border-cyan-200 text-cyan-900 rounded-xl font-bold shadow-sm transition-all text-xs sm:text-sm flex items-center justify-center gap-1.5 active:scale-95">
+              <svg class="w-4 h-4 text-cyan-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              <span>تحميل فيكتور SVG دقيق</span>
+            </button>
+          </div>
+          
+          <p class="text-center text-[11px] text-slate-600">
+            🦷 الدقة المصدرة مصممة لتصلح للطباعة على لوحات الأكريليك وطاولات الانتظار بدون أي تشوش.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="lg:col-span-6 space-y-6">
+        
+        <!-- Customization Card -->
+        <div class="glass-card rounded-3xl p-6 sm:p-7 shadow-xl border border-cyan-100">
+          <div class="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
+            <div class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold">
+              🦷
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-lg">تخصيص محتوى عيادة الأسنان</h3>
+              <p class="text-xs text-slate-500">اختر نوع الخدمة مع الحفاظ التام على هوية وطابع عيادة الأسنان</p>
+            </div>
+          </div>
+
+          <div class="space-y-5">
+            <!-- QR Content Type Selector (All Dental Hybrid Presets) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">نوع الخدمة السنّية المراد تحويلها لباركود:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                
+                <button type="button" onclick="setQrType('url')" id="typeBtn-url" class="type-btn border-2 border-cyan-600 bg-cyan-50/70 rounded-xl p-2.5 flex flex-col items-center gap-1.5 transition-all text-center">
+                  <span class="text-lg">🦷🌐</span>
+                  <span class="text-xs font-bold text-slate-800">موقع العيادة</span>
+                  <span class="text-[10px] text-cyan-700 leading-tight">حجز وخدمات</span>
+                </button>
+
+                <button type="button" onclick="setQrType('wifi')" id="typeBtn-wifi" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
+                  <span class="text-lg">🦷📶</span>
+                  <span class="text-xs font-bold text-slate-800">واي فاي الانتظار</span>
+                  <span class="text-[10px] text-slate-500 leading-tight">اتصال فوري</span>
+                </button>
+
+                <button type="button" onclick="setQrType('whatsapp')" id="typeBtn-whatsapp" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
+                  <span class="text-lg">🦷💬</span>
+                  <span class="text-xs font-bold text-slate-800">واتساب الطوارئ</span>
+                  <span class="text-[10px] text-slate-500 leading-tight">محادثة كشف</span>
+                </button>
+
+                <button type="button" onclick="setQrType('vcard')" id="typeBtn-vcard" class="type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center">
+                  <span class="text-lg">🦷🪪</span>
+                  <span class="text-xs font-bold text-slate-800">بطاقة الطبيب</span>
+                  <span class="text-[10px] text-slate-500 leading-tight">حفظ جهة الاتصال</span>
+                </button>
+
+              </div>
+            </div>
+
+            <!-- DYNAMIC INPUT FIELDS BASED ON QR TYPE -->
+
+            <!-- 1. URL Section -->
+            <div id="section-url" class="p-4 bg-cyan-50/50 rounded-2xl border border-cyan-200 space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">رابط موقع العيادة (Doctor.S Website):</label>
+                <input id="inputUrl" type="url" value="https://nurse9sy-cyber.github.io/Doctor.S/" oninput="onDataChanged()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
+              </div>
+            </div>
+
+            <!-- 2. Wi-Fi Section -->
+            <div id="section-wifi" class="hidden p-4 bg-gradient-to-br from-cyan-50/90 to-teal-50/70 rounded-2xl border border-cyan-300 space-y-3">
+              <div class="flex items-center gap-2 text-cyan-900 font-bold text-xs bg-white/70 p-2.5 rounded-xl border border-cyan-200">
+                <span class="text-base">🦷📶</span>
+                <span>واي فاي صالة استقبال الأسنان: بمجرد توجيه الكاميرا يتصل هاتف المريض مباشرة دون عناء كتابة الرمز!</span>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">اسم شبكة واي فاي العيادة (SSID):</label>
+                <input id="inputWifiSsid" type="text" value="Doctor.S_Dental_Clinic" oninput="onDataChanged()" placeholder="Doctor.S_Dental_Clinic" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="text-xs font-bold text-slate-700">كلمة سر الشبكة (Password):</label>
+                  <label class="text-[11px] text-slate-500 flex items-center gap-1 cursor-pointer">
+                    <input type="checkbox" id="toggleWifiPass" onchange="togglePassVisibility()" class="rounded text-cyan-600 focus:ring-0">
+                    <span>إظهار الرمز</span>
+                  </label>
+                </div>
+                <input id="inputWifiPassword" type="password" value="Clinic@2026" oninput="onDataChanged()" placeholder="كلمة المرور للشبكة" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all font-mono" dir="ltr">
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">نوع التشفير:</label>
+                  <select id="inputWifiAuth" onchange="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 bg-white focus:border-cyan-500 outline-none">
+                    <option value="WPA" selected>WPA / WPA2 / WPA3 (القياسي)</option>
+                    <option value="nopass">شبكة زوار مفتوحة بدون كلمة سر</option>
+                    <option value="WEP">WEP</option>
+                  </select>
+                </div>
+                <div class="flex items-center pt-5">
+                  <label class="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
+                    <input type="checkbox" id="inputWifiHidden" onchange="onDataChanged()" class="w-4 h-4 rounded text-cyan-600 focus:ring-cyan-500">
+                    <span>شبكة مخفية (Hidden)</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. WhatsApp Section -->
+            <div id="section-whatsapp" class="hidden p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-3">
+              <div class="flex items-center gap-2 text-emerald-900 font-bold text-xs bg-white/70 p-2 rounded-xl border border-emerald-200">
+                <span class="text-base">🦷💬</span>
+                <span>حجز سريع عبر واتساب عيادة الأسنان لحالات الطوارئ والكشف</span>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">رقم واتساب العيادة (استخدم 00 للكود الدولي دون أي إشارة زائد):</label>
+                <input id="inputWaPhone" type="text" value="00963900000000" oninput="sanitizePhoneInput(this); onDataChanged()" placeholder="00963900000000" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all font-mono" dir="ltr">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">الرسالة المجهزة تلقائياً للمريض:</label>
+                <textarea id="inputWaMessage" rows="2" oninput="onDataChanged()" class="w-full text-xs px-3.5 py-2 rounded-xl border border-slate-200 focus:border-emerald-500 outline-none">مرحباً د. سارة، أود الاستفسار وحجز موعد كشف أو تبييض أسنان بالعيادة.</textarea>
+              </div>
+            </div>
+
+            <!-- 4. vCard Contact Section -->
+            <div id="section-vcard" class="hidden p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+              <div class="flex items-center gap-2 text-cyan-900 font-bold text-xs bg-white/70 p-2 rounded-xl border border-cyan-200">
+                <span class="text-base">🦷🪪</span>
+                <span>بطاقة اتصال إلكترونية لحفظ رقم وعنوان عيادة الأسنان بضغطة زر</span>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">الاسم واللقب الطبي:</label>
+                  <input id="inputVcardName" type="text" value="د. سارة لطب وتجميل الأسنان" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف العيادة (أرقام فقط أو 00 دون إشارة زائد):</label>
+                  <input id="inputVcardPhone" type="text" value="00963900000000" oninput="sanitizePhoneInput(this); onDataChanged()" placeholder="00963900000000" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none font-mono" dir="ltr">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني للعيادة:</label>
+                  <input id="inputVcardEmail" type="email" value="clinic@doctors.com" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none font-mono" dir="ltr">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">العنوان والمدينة:</label>
+                  <input id="inputVcardAddress" type="text" value="عيادة د. سارة لطب الأسنان" oninput="onDataChanged()" class="w-full text-xs px-3 py-2 rounded-xl border border-slate-200 outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- Dental Color Palette Selector -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">ألوان الهوية الطبية لعيادة الأسنان:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" onclick="setPalette('cyan')" class="palette-btn border-2 border-cyan-500 rounded-xl p-2.5 flex flex-col items-center gap-1.5 bg-cyan-50/50 transition-all hover:shadow-sm">
+                  <div class="flex gap-1">
+                    <span class="w-4 h-4 rounded-full bg-[#0891b2]"></span>
+                    <span class="w-4 h-4 rounded-full bg-[#0e7490]"></span>
+                  </div>
+                  <span class="text-xs font-bold text-cyan-900">سماوي عيادات</span>
+                </button>
+                <button type="button" onclick="setPalette('ocean')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
+                  <div class="flex gap-1">
+                    <span class="w-4 h-4 rounded-full bg-[#1e40af]"></span>
+                    <span class="w-4 h-4 rounded-full bg-[#0369a1]"></span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700">أزرق جراحي</span>
+                </button>
+                <button type="button" onclick="setPalette('emerald')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
+                  <div class="flex gap-1">
+                    <span class="w-4 h-4 rounded-full bg-[#059669]"></span>
+                    <span class="w-4 h-4 rounded-full bg-[#0f766e]"></span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700">أخضر معقم</span>
+                </button>
+                <button type="button" onclick="setPalette('dark')" class="palette-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all">
+                  <div class="flex gap-1">
+                    <span class="w-4 h-4 rounded-full bg-[#0f172a]"></span>
+                    <span class="w-4 h-4 rounded-full bg-[#334155]"></span>
+                  </div>
+                  <span class="text-xs font-bold text-slate-700">كحلي فاخر</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Dental Center Icon Selector (All Dental-Themed) -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-2">أيقونة السن المدمجة في منتصف الباركود (Dental Icons):</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                
+                <button type="button" onclick="setCenterIcon('tooth-pure')" id="iconBtn-tooth-pure" class="icon-btn border-2 border-cyan-500 bg-cyan-50/50 py-2 px-2.5 rounded-xl text-xs font-bold text-cyan-900 flex items-center justify-center gap-1.5">
+                  <span class="text-sm">🦷✨</span>
+                  <span>سن ناصع</span>
+                </button>
+
+                <button type="button" onclick="setCenterIcon('tooth-wifi')" id="iconBtn-tooth-wifi" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                  <span class="text-sm">🦷📶</span>
+                  <span>سن وواي فاي</span>
+                </button>
+
+                <button type="button" onclick="setCenterIcon('tooth-chat')" id="iconBtn-tooth-chat" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                  <span class="text-sm">🦷💬</span>
+                  <span>سن وحجز</span>
+                </button>
+
+                <button type="button" onclick="setCenterIcon('tooth-doctor')" id="iconBtn-tooth-doctor" class="icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                  <span class="text-sm">🦷🔍</span>
+                  <span>سن ومرآة فحص</span>
+                </button>
+
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 space-y-3">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">اسم العيادة / الطبيب في البطاقة:</label>
+                <input id="inputTitle" type="text" value="عيادة د. سارة لطب وتجميل الأسنان" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">الوصف التخصصي للعيادة:</label>
+                  <input id="inputSubtitle" type="text" value="Dental & Aesthetic Clinic" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">نص الإرشاد الموجه للمريض في العيادة:</label>
+                  <input id="inputAction" type="text" value="امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك" oninput="updateCardTexts()" class="w-full text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all">
+                </div>
+              </div>
+
+              <!-- Dental Footer Slogan Control (Edit or Delete) -->
+              <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <span>🦷</span>
+                    <span>الجملة الختامية / شعار أسفل البطاقة واللوحة:</span>
+                  </label>
+                  <div class="flex items-center gap-3">
+                    <label class="text-[11px] text-slate-600 flex items-center gap-1 cursor-pointer font-medium">
+                      <input type="checkbox" id="toggleSlogan" checked onchange="toggleSloganVisibility()" class="rounded text-cyan-600 focus:ring-0 w-3.5 h-3.5">
+                      <span>إظهار الجملة</span>
+                    </label>
+                    <button type="button" onclick="clearSlogan()" class="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline">
+                      حذف نهائي ✕
+                    </button>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <input id="inputSlogan" type="text" value="ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨" oninput="updateCardTexts()" placeholder="اكتب جملتك المخصصة هنا أو اتركها فارغة للحذف..." class="flex-1 text-xs px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-200 outline-none transition-all bg-white">
+                  <button type="button" onclick="resetDefaultSlogan()" title="استعادة الجملة الافتراضية" class="px-2.5 py-1 text-xs font-semibold text-cyan-800 bg-cyan-100 hover:bg-cyan-200 rounded-xl transition-colors shrink-0">
+                    استعادة
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Clinical Feature Badges -->
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
+            <span class="text-xl block mb-1">🖨️</span>
+            <h4 class="text-xs font-bold text-slate-800">طبعة عيادة فاخرة</h4>
+            <p class="text-[10px] text-slate-400 mt-0.5">جاهز للاستاند والأكريليك</p>
+          </div>
+          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
+            <span class="text-xl block mb-1">🦷</span>
+            <h4 class="text-xs font-bold text-slate-800">طابع سني متكامل</h4>
+            <p class="text-[10px] text-slate-400 mt-0.5">لكل أنواع الباركود</p>
+          </div>
+          <div class="p-3.5 bg-white rounded-2xl border border-cyan-100 text-center shadow-sm">
+            <span class="text-xl block mb-1">⚡</span>
+            <h4 class="text-xs font-bold text-slate-800">قراءة فائقة السرعة</h4>
+            <p class="text-[10px] text-slate-400 mt-0.5">تصحيح أخطاء مستوى H</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-semibold shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+    <span id="toastMsg">تم النسخ بنجاح</span>
+  </div>
+
+  <script>
+    // 1. Pure Pearly Tooth with Sparkle
+    const toothPureSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
+        <path fill="#0891b2" d="M50 18C37 18 28 25 24 33C18 44 18 56 20 69C23 88 31 92 37 92C40 92 43 89 45 84C47 80 48 70 50 70C52 70 53 80 55 84C57 89 60 92 63 92C69 92 77 88 80 69C82 56 82 44 76 33C72 25 63 18 50 18ZM34 37C37 37 40 40 39 44C37 51 32 57 25 58C21 59 19 56 20 52C21 43 27 37 34 37Z"/>
+        <polygon points="76,20 78,26 84,28 78,30 76,36 74,30 68,28 74,26" fill="#06b6d4" />
+        <polygon points="26,24 27,28 31,29 27,30 26,34 25,30 21,29 25,28" fill="#06b6d4" />
+      </svg>
+    `)}`;
+
+    // 2. Dental Tooth and Radiating Wi-Fi Waves
+    const toothWifiSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
+        <!-- Radiating Wi-Fi Waves above tooth crown -->
+        <path fill="none" stroke="#0891b2" stroke-width="4.5" stroke-linecap="round" d="M30 24 A 28 28 0 0 1 70 24" />
+        <path fill="none" stroke="#0891b2" stroke-width="4.5" stroke-linecap="round" d="M38 31 A 18 18 0 0 1 62 31" />
+        <circle cx="50" cy="37" r="3" fill="#0891b2" />
+        <!-- Dental Tooth Base -->
+        <path fill="#0891b2" d="M50 44C40 44 33 49 30 55C25 64 25 72 27 82C29 93 35 96 39 96C42 96 44 93 46 89C47 86 48 80 50 80C52 80 53 86 54 89C56 93 58 96 61 96C65 96 71 93 73 82C75 72 75 64 70 55C67 49 60 44 50 44Z"/>
+      </svg>
+    `)}`;
+
+    // 3. Dental Tooth and WhatsApp Chat Bubble
+    const toothChatSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
+        <!-- Tooth on left -->
+        <path fill="#0891b2" d="M42 22C32 22 25 28 22 34C17 43 17 53 19 63C21 78 27 82 32 82C35 82 37 79 38 75C39 72 40 65 42 65C44 65 45 72 46 75C47 79 49 82 52 82C57 82 63 78 65 63C66 57 66 52 64 47C62 47 60 47 58 47C50 47 43 43 38 37C34 32 32 27 33 22C36 22 39 22 42 22Z"/>
+        <!-- Chat Bubble on right -->
+        <circle cx="68" cy="38" r="18" fill="#10b981" />
+        <path fill="#10b981" d="M57 48 L 53 58 L 64 52 Z" />
+        <!-- Phone icon inside bubble -->
+        <path fill="#ffffff" d="M63 32 C62 31 60 31 59 32 L58 33 C57 34 57 35 58 36 C59 38 61 40 63 42 C64 43 66 44 67 43 L68 42 C69 41 69 39 68 38 L67 37 C66 36 65 36 64 37 L63 38 Z" />
+      </svg>
+    `)}`;
+
+    // 4. Dental Tooth and Dental Inspection Mirror (No plus/cross signs)
+    const toothDoctorSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48" fill="#ffffff" stroke="#0891b2" stroke-width="4"/>
+        <!-- Main Dental Tooth -->
+        <path fill="#0891b2" d="M50 16C37 16 28 23 24 31C18 42 18 54 20 67C23 87 31 92 37 92C40 92 43 89 45 84C47 80 48 69 50 69C52 69 53 80 55 84C57 89 60 92 63 92C69 92 77 87 80 67C82 54 82 42 76 31C72 23 63 16 50 16Z"/>
+        <!-- Dental Inspection Mirror (No cross/plus sign) -->
+        <circle cx="50" cy="45" r="13" fill="#ffffff" stroke="#0891b2" stroke-width="3" />
+        <circle cx="50" cy="45" r="8" fill="#cffafe" />
+        <path fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" d="M50 58 L50 78" />
+      </svg>
+    `)}`;
+
+    // Palette Configurations
+    const PALETTES = {
+      cyan: {
+        dotColor: "#0891b2",
+        cornerSquareColor: "#0e7490",
+        cornerDotColor: "#06b6d4",
+        gradientStart: "#0891b2",
+        gradientEnd: "#0e7490",
+        accent: "#0891b2"
+      },
+      ocean: {
+        dotColor: "#1d4ed8",
+        cornerSquareColor: "#1e3a8a",
+        cornerDotColor: "#2563eb",
+        gradientStart: "#1d4ed8",
+        gradientEnd: "#1e3a8a",
+        accent: "#1d4ed8"
+      },
+      emerald: {
+        dotColor: "#059669",
+        cornerSquareColor: "#064e3b",
+        cornerDotColor: "#10b981",
+        gradientStart: "#059669",
+        gradientEnd: "#065f46",
+        accent: "#059669"
+      },
+      dark: {
+        dotColor: "#0f172a",
+        cornerSquareColor: "#020617",
+        cornerDotColor: "#334155",
+        gradientStart: "#0f172a",
+        gradientEnd: "#1e293b",
+        accent: "#0f172a"
+      }
+    };
+
+    // State Variables
+    let currentQrType = 'url';
+    let currentPaletteKey = 'cyan';
+    let currentDotType = 'rounded';
+    let currentIconKey = 'tooth-pure';
+    let qrCodeInstance = null;
+
+    // Remove any plus signs from inputs automatically
+    function sanitizePhoneInput(inputElement) {
+      if (inputElement && inputElement.value) {
+        inputElement.value = inputElement.value.replace(/\+/g, '');
+      }
+    }
+
+    // Global listener to prevent any plus signs from persisting across any inputs
+    document.addEventListener('input', (e) => {
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        if (e.target.value && e.target.value.includes('+')) {
+          e.target.value = e.target.value.replace(/\+/g, '');
+          onDataChanged();
+        }
+      }
+    });
+
+    // Build the raw encoded payload based on selected QR type
+    function getQrPayload() {
+      if (currentQrType === 'wifi') {
+        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
+        const pass = document.getElementById("inputWifiPassword").value || "";
+        const auth = document.getElementById("inputWifiAuth").value || "WPA";
+        const hidden = document.getElementById("inputWifiHidden").checked ? "true" : "false";
+
+        // Wi-Fi standard schema: WIFI:S:<SSID>;T:<WPA|WEP|nopass>;P:<PASSWORD>;H:<true|false>;;
+        const cleanSsid = ssid.replace(/([\\;,:"])/g, '\\$1');
+        const cleanPass = pass.replace(/([\\;,:"])/g, '\\$1');
+        return `WIFI:S:${cleanSsid};T:${auth};P:${cleanPass};H:${hidden};;`;
+      }
+
+      if (currentQrType === 'whatsapp') {
+        // Strip out any plus signs or non-digits
+        const rawPhone = document.getElementById("inputWaPhone").value.replace(/[^0-9]/g, "");
+        const message = encodeURIComponent(document.getElementById("inputWaMessage").value || "");
+        return `https://wa.me/${rawPhone}?text=${message}`;
+      }
+
+      if (currentQrType === 'vcard') {
+        const name = document.getElementById("inputVcardName").value || "د. سارة لطب وتجميل الأسنان";
+        const phone = document.getElementById("inputVcardPhone").value.replace(/[^0-9]/g, "") || "";
+        const email = document.getElementById("inputVcardEmail").value || "";
+        const address = document.getElementById("inputVcardAddress").value || "";
+        const website = "https://nurse9sy-cyber.github.io/Doctor.S/";
+
+        return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nORG:عيادة د. سارة لطب وجراحة وتجميل الأسنان\nTITLE:طبيبة وجراحة أسنان\nTEL:${phone}\nEMAIL:${email}\nADR:;;${address};;;\nURL:${website}\nEND:VCARD`;
+      }
+
+      // Default: Dental Clinic URL
+      return document.getElementById("inputUrl").value.trim() || "https://nurse9sy-cyber.github.io/Doctor.S/";
+    }
+
+    // Always returns an icon that strongly reflects dentistry
+    function getSelectedIconUrl() {
+      if (currentIconKey === 'tooth-wifi') return toothWifiSvg;
+      if (currentIconKey === 'tooth-chat') return toothChatSvg;
+      if (currentIconKey === 'tooth-doctor') return toothDoctorSvg;
+      return toothPureSvg;
+    }
+
+    function createQrOptions(size = 280) {
+      const palette = PALETTES[currentPaletteKey];
+      return {
+        width: size,
+        height: size,
+        data: getQrPayload(),
+        image: getSelectedIconUrl(),
+        margin: 6,
+        qrOptions: {
+          typeNumber: 0,
+          mode: 'Byte',
+          errorCorrectionLevel: 'H'
+        },
+        imageOptions: {
+          hideBackgroundDots: true,
+          imageSize: 0.36,
+          margin: 4,
+          crossOrigin: 'anonymous'
+        },
+        dotsOptions: {
+          type: currentDotType,
+          gradient: {
+            type: "linear",
+            rotation: 45,
+            colorStops: [
+              { offset: 0, color: palette.gradientStart },
+              { offset: 1, color: palette.gradientEnd }
+            ]
+          }
+        },
+        backgroundOptions: {
+          color: "#ffffff"
+        },
+        cornersSquareOptions: {
+          type: "extra-rounded",
+          color: palette.cornerSquareColor
+        },
+        cornersDotOptions: {
+          type: "dot",
+          color: palette.cornerDotColor
+        }
+      };
+    }
+
+    function renderQr() {
+      const container = document.getElementById("qrCodeDiv");
+      container.innerHTML = "";
+      
+      const options = createQrOptions(280);
+      qrCodeInstance = new QRCodeStyling(options);
+      qrCodeInstance.append(container);
+
+      // Render into standalone view container as well
+      const standaloneContainer = document.getElementById("qrStandaloneClone");
+      if (standaloneContainer) {
+        standaloneContainer.innerHTML = "";
+        const standaloneQr = new QRCodeStyling(createQrOptions(300));
+        standaloneQr.append(standaloneContainer);
+      }
+
+      updateCardEmblemIcon();
+      updateBannerAndCardInfo();
+    }
+
+    // Updates top badge on the clinic card
+    function updateCardEmblemIcon() {
+      const emblemInner = document.getElementById("cardEmblemInner");
+      let iconMarkup = '';
+
+      if (currentIconKey === 'tooth-wifi' || currentQrType === 'wifi') {
+        iconMarkup = `
+          <svg viewBox="0 0 24 24" class="w-full h-full fill-white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
+          </svg>`;
+      } else {
+        iconMarkup = `
+          <svg viewBox="0 0 24 24" class="w-full h-full fill-white" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C9.5 2 7.7 3.3 6.9 4.8C5.8 6.8 5.7 9.2 6.1 11.6C6.7 15.3 8.3 20.3 9.4 21.6C9.9 22.2 10.7 22 11.2 21.4C11.7 20.7 12 18.2 12 16.5C12 18.2 12.3 20.7 12.8 21.4C13.3 22 14.1 22.2 14.6 21.6C15.7 20.3 17.3 15.3 17.9 11.6C18.3 9.2 18.2 6.8 17.1 4.8C16.3 3.3 14.5 2 12 2ZM8.8 6C9.5 6 10 6.6 9.8 7.3C9.5 8.7 8.5 9.7 7.1 10C6.4 10.2 5.8 9.7 5.9 9C6.1 7.3 7.3 6 8.8 6Z"/>
+          </svg>`;
+      }
+      emblemInner.innerHTML = iconMarkup;
+    }
+
+    // Handler when user switches QR type
+    function setQrType(type) {
+      currentQrType = type;
+      
+      // Update Tab button active styles
+      ['url', 'wifi', 'whatsapp', 'vcard'].forEach(t => {
+        const btn = document.getElementById(`typeBtn-${t}`);
+        const section = document.getElementById(`section-${t}`);
+        if (t === type) {
+          btn.className = "type-btn border-2 border-cyan-600 bg-cyan-50/70 rounded-xl p-2.5 flex flex-col items-center gap-1.5 transition-all text-center";
+          section.classList.remove('hidden');
+        } else {
+          btn.className = "type-btn border border-slate-200 rounded-xl p-2.5 flex flex-col items-center gap-1.5 hover:bg-slate-50 transition-all text-center";
+          section.classList.add('hidden');
+        }
+      });
+
+      // Auto assign matched dental-hybrid icon
+      if (type === 'wifi') {
+        highlightCenterIcon('tooth-wifi');
+      } else if (type === 'whatsapp') {
+        highlightCenterIcon('tooth-chat');
+      } else if (type === 'vcard') {
+        highlightCenterIcon('tooth-doctor');
+      } else {
+        highlightCenterIcon('tooth-pure');
+      }
+
+      // Dental specific texts per service
+      const titleInput = document.getElementById("inputTitle");
+      const subtitleInput = document.getElementById("inputSubtitle");
+      const actionInput = document.getElementById("inputAction");
+
+      if (type === 'wifi') {
+        titleInput.value = "واي فاي صالة انتظار عيادة الأسنان";
+        subtitleInput.value = "Doctor.S Dental Clinic - Free Patient Wi-Fi";
+        actionInput.value = "امسح الكود بكاميرا هاتفك للاتصال فورا بشبكة العيادة بدون إدخال الرمز";
+      } else if (type === 'whatsapp') {
+        titleInput.value = "حجز ومتابعة حالات الأسنان (واتساب)";
+        subtitleInput.value = "Doctor.S Dental Booking & Emergency Desk";
+        actionInput.value = "امسح الكود لبدء محادثة فورية وحجز موعد كشف أو تبييض أسنان";
+      } else if (type === 'vcard') {
+        titleInput.value = "بطاقة التواصل لعيادة د. سارة للأسنان";
+        subtitleInput.value = "Save Dental Clinic Contact & Emergency";
+        actionInput.value = "امسح الكود لحفظ هاتف وعنوان عيادة الأسنان مباشرة في هاتفك";
+      } else {
+        titleInput.value = "عيادة د. سارة لطب وتجميل الأسنان";
+        subtitleInput.value = "Dental & Aesthetic Clinic";
+        actionInput.value = "امسح الكود لزيارة موقع العيادة والاطلاع على الخدمات وحجز موعدك";
+      }
+
+      updateCardTexts();
+      renderQr();
+      showToast(`تم التبديل إلى: ${type === 'wifi' ? 'واي فاي عيادة الأسنان' : type === 'whatsapp' ? 'واتساب الأسنان' : type === 'vcard' ? 'بطاقة طبيب الأسنان' : 'موقع العيادة'}`);
+    }
+
+    function highlightCenterIcon(iconKey) {
+      currentIconKey = iconKey;
+      ['tooth-pure', 'tooth-wifi', 'tooth-chat', 'tooth-doctor'].forEach(k => {
+        const btn = document.getElementById(`iconBtn-${k}`);
+        if (btn) {
+          if (k === iconKey) {
+            btn.className = "icon-btn border-2 border-cyan-500 bg-cyan-50/50 py-2 px-2.5 rounded-xl text-xs font-bold text-cyan-900 flex items-center justify-center gap-1.5";
+          } else {
+            btn.className = "icon-btn border border-slate-200 text-slate-700 hover:bg-slate-50 py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5";
+          }
+        }
+      });
+    }
+
+    function setCenterIcon(iconKey) {
+      highlightCenterIcon(iconKey);
+      renderQr();
+      showToast("تم تحديث أيقونة السن في الباركود 🦷");
+    }
+
+    function onDataChanged() {
+      renderQr();
+    }
+
+    function togglePassVisibility() {
+      const passInput = document.getElementById("inputWifiPassword");
+      const check = document.getElementById("toggleWifiPass");
+      passInput.type = check.checked ? "text" : "password";
+    }
+
+    function updateBannerAndCardInfo() {
+      const urlDisplay = document.getElementById("urlDisplay");
+      const bannerLabel = document.getElementById("bannerTypeLabel");
+      const btnActionLabel = document.getElementById("btnActionLabel");
+      const wifiBadge = document.getElementById("wifiDetailsBadge");
+
+      if (currentQrType === 'wifi') {
+        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
+        const pass = document.getElementById("inputWifiPassword").value || "";
+        bannerLabel.innerText = "واي فاي صالة انتظار مرضى الأسنان";
+        urlDisplay.innerText = `شبكة: ${ssid} | كلمة المرور: ${pass}`;
+        btnActionLabel.innerText = "نسخ بيانات الشبكة";
+        if (wifiBadge) {
+          wifiBadge.classList.remove('hidden');
+          document.getElementById("cardWifiName").innerText = ssid;
+          document.getElementById("cardWifiPass").innerText = pass;
+        }
+      } else if (currentQrType === 'whatsapp') {
+        const phone = (document.getElementById("inputWaPhone").value || "").replace(/\+/g, '');
+        bannerLabel.innerText = "واتساب كشف وطوارئ الأسنان";
+        urlDisplay.innerText = phone ? `واتساب: ${phone}` : "واتساب العيادة";
+        btnActionLabel.innerText = "فتح محادثة واتساب";
+        if (wifiBadge) wifiBadge.classList.add('hidden');
+      } else if (currentQrType === 'vcard') {
+        const name = document.getElementById("inputVcardName").value || "د. سارة لطب وتجميل الأسنان";
+        const phone = (document.getElementById("inputVcardPhone").value || "").replace(/\+/g, '');
+        bannerLabel.innerText = "بطاقة جهة اتصال طبيب الأسنان";
+        urlDisplay.innerText = `${name} (${phone})`;
+        btnActionLabel.innerText = "تنزيل بطاقة جهة الاتصال";
+        if (wifiBadge) wifiBadge.classList.add('hidden');
+      } else {
+        const url = document.getElementById("inputUrl").value || "https://nurse9sy-cyber.github.io/Doctor.S/";
+        bannerLabel.innerText = "بيانات كود عيادة الأسنان";
+        urlDisplay.innerText = url;
+        btnActionLabel.innerText = "معاينة الرابط";
+        if (wifiBadge) wifiBadge.classList.add('hidden');
+      }
+    }
+
+    function copyClinicData() {
+      let textToCopy = getQrPayload();
+      if (currentQrType === 'wifi') {
+        const pass = document.getElementById("inputWifiPassword").value;
+        const ssid = document.getElementById("inputWifiSsid").value;
+        textToCopy = `شبكة واي فاي عيادة الأسنان: ${ssid}\nكلمة السر: ${pass}`;
+      }
+
+      const textarea = document.createElement("textarea");
+      textarea.value = textToCopy;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast("تم النسخ بنجاح إلى الحافظة!");
+      } catch (err) {
+        showToast("تعذر النسخ التلقائي");
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function testQrAction() {
+      if (currentQrType === 'wifi') {
+        const pass = document.getElementById("inputWifiPassword").value;
+        copyClinicData();
+        showToast(`تم نسخ رمز واي فاي العيادة: ${pass}`);
+      } else if (currentQrType === 'whatsapp') {
+        window.open(getQrPayload(), '_blank');
+      } else if (currentQrType === 'vcard') {
+        const blob = new Blob([getQrPayload()], { type: 'text/vcard;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = "dental-clinic-card.vcf";
+        link.click();
+      } else {
+        window.open(document.getElementById("inputUrl").value, '_blank');
+      }
+    }
+
+    // Palette Selector Handler
+    function setPalette(key) {
+      currentPaletteKey = key;
+      document.querySelectorAll('.palette-btn').forEach(btn => {
+        btn.classList.remove('border-2', 'border-cyan-500', 'bg-cyan-50/50');
+        btn.classList.add('border', 'border-slate-200');
+      });
+      event.currentTarget.classList.add('border-2', 'border-cyan-500', 'bg-cyan-50/50');
+      event.currentTarget.classList.remove('border-slate-200');
+      
+      renderQr();
+      showToast("تم تحديث لون الهوية السنّية");
+    }
+
+    function updateCardTexts() {
+      const title = document.getElementById("inputTitle").value.trim() || "عيادة د. سارة لطب وتجميل الأسنان";
+      const subtitle = document.getElementById("inputSubtitle").value.trim() || "Dental & Aesthetic Clinic";
+      const action = document.getElementById("inputAction").value.trim() || "امسح الكود لزيارة موقع العيادة وحجز موعدك";
+      const slogan = document.getElementById("inputSlogan").value.trim();
+      const isSloganVisible = document.getElementById("toggleSlogan").checked;
+
+      document.getElementById("cardTitle").innerText = title;
+      document.getElementById("cardSubtitleText").innerText = subtitle;
+      document.getElementById("cardActionText").innerText = action;
+
+      const sloganContainer = document.getElementById("cardSloganContainer");
+      if (sloganContainer) {
+        if (!isSloganVisible || slogan === "") {
+          sloganContainer.classList.add("hidden");
+        } else {
+          sloganContainer.classList.remove("hidden");
+          document.getElementById("cardSloganText").innerText = slogan;
+        }
+      }
+    }
+
+    function toggleSloganVisibility() {
+      const isVisible = document.getElementById("toggleSlogan").checked;
+      const input = document.getElementById("inputSlogan");
+      input.disabled = !isVisible;
+      if (!isVisible) {
+        input.classList.add("opacity-50", "bg-slate-100");
+        showToast("تم إخفاء جملة التذييل");
+      } else {
+        input.classList.remove("opacity-50", "bg-slate-100");
+        showToast("تم تفعيل جملة التذييل");
+      }
+      updateCardTexts();
+    }
+
+    function clearSlogan() {
+      document.getElementById("inputSlogan").value = "";
+      document.getElementById("toggleSlogan").checked = false;
+      toggleSloganVisibility();
+      showToast("تم حذف جملة التذييل بنجاح ✕");
+    }
+
+    function resetDefaultSlogan() {
+      document.getElementById("inputSlogan").value = "ابتسامتك الجميلة وصحة أسنانك هي أولويتنا 🦷✨";
+      document.getElementById("toggleSlogan").checked = true;
+      document.getElementById("inputSlogan").disabled = false;
+      document.getElementById("inputSlogan").classList.remove("opacity-50", "bg-slate-100");
+      updateCardTexts();
+      showToast("تمت استعادة الجملة الافتراضية 🦷");
+    }
+
+    function switchPreviewMode(mode) {
+      const standContainer = document.getElementById("standCardContainer");
+      const qrOnlyContainer = document.getElementById("qrOnlyContainer");
+      const tabCard = document.getElementById("tabCardBtn");
+      const tabQr = document.getElementById("tabQrBtn");
+
+      if (mode === 'card') {
+        standContainer.classList.remove('hidden');
+        qrOnlyContainer.classList.add('hidden');
+        tabCard.classList.add('bg-white', 'text-cyan-800', 'shadow-sm');
+        tabCard.classList.remove('text-slate-600');
+        tabQr.classList.remove('bg-white', 'text-cyan-800', 'shadow-sm');
+        tabQr.classList.add('text-slate-600');
+      } else {
+        standContainer.classList.add('hidden');
+        qrOnlyContainer.classList.remove('hidden');
+        tabQr.classList.add('bg-white', 'text-cyan-800', 'shadow-sm');
+        tabQr.classList.remove('text-slate-600');
+        tabCard.classList.remove('bg-white', 'text-cyan-800', 'shadow-sm');
+        tabCard.classList.add('text-slate-600');
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      const msg = document.getElementById("toastMsg");
+      msg.innerText = message;
+      toast.classList.remove("opacity-0", "pointer-events-none");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0", "pointer-events-none");
+      }, 2500);
+    }
+
+    function downloadQrOnly(extension) {
+      showToast("جاري تنزيل كود الباركود السنّي...");
+      
+      const fileName = `dental-clinic-${currentQrType}-qr`;
+      if (extension === 'svg') {
+        const svgQr = new QRCodeStyling({
+          ...createQrOptions(1200),
+          type: "svg"
+        });
+        svgQr.download({ name: fileName, extension: "svg" });
+      } else {
+        const hdQr = new QRCodeStyling({
+          ...createQrOptions(2000),
+          type: "canvas"
+        });
+        hdQr.download({ name: `${fileName}-2000px`, extension: "png" });
+      }
+    }
+
+    // Print-ready Ultra HD Dental Clinic Poster
+    async function downloadHighResPoster() {
+      showToast("جاري إعداد وتصدير لوحة العيادة السنّية الفائقة (300 DPI Ultra HD)...");
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 2400;
+      canvas.height = 3200;
+      const ctx = canvas.getContext('2d');
+
+      const palette = PALETTES[currentPaletteKey];
+      const title = document.getElementById("inputTitle").value.trim() || "عيادة د. سارة لطب وتجميل الأسنان";
+      const subtitle = document.getElementById("inputSubtitle").value.trim() || "Dental & Aesthetic Clinic";
+      const actionText = document.getElementById("inputAction").value.trim() || "امسح الكود بهاتفك";
+
+      // 1. Elegant Pearly Dental Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, 3200);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(0.5, '#f8fafc');
+      bgGrad.addColorStop(1, '#ecfeff');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 2400, 3200);
+
+      // Frame Border with Dental Clinic Colors
+      ctx.strokeStyle = palette.cornerSquareColor;
+      ctx.lineWidth = 22;
+      ctx.strokeRect(60, 60, 2280, 3080);
+
+      // Inner thin cyan border
+      ctx.strokeStyle = '#cffafe';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(88, 88, 2224, 3024);
+
+      // 2. Corner Dental Watermarks
+      ctx.save();
+      ctx.font = '100px sans-serif';
+      ctx.fillStyle = 'rgba(6, 182, 212, 0.15)';
+      ctx.fillText('🦷', 140, 220);
+      ctx.fillText('🦷', 2180, 220);
+      ctx.fillText('🦷', 140, 3040);
+      ctx.fillText('🦷', 2180, 3040);
+      ctx.restore();
+
+      // 3. Top Dental Emblem Badge
+      const emblemY = 360;
+      ctx.save();
+      ctx.shadowColor = 'rgba(8, 145, 178, 0.28)';
+      ctx.shadowBlur = 40;
+      ctx.shadowOffsetY = 15;
+      
+      const badgeGrad = ctx.createLinearGradient(1200 - 120, emblemY - 120, 1200 + 120, emblemY + 120);
+      badgeGrad.addColorStop(0, palette.gradientStart);
+      badgeGrad.addColorStop(1, palette.gradientEnd);
+      ctx.fillStyle = badgeGrad;
+      
+      const rx = 1200 - 120, ry = emblemY - 120, rw = 240, rh = 240, radius = 50;
+      ctx.beginPath();
+      ctx.moveTo(rx + radius, ry);
+      ctx.lineTo(rx + rw - radius, ry);
+      ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+      ctx.lineTo(rx + rw, ry + rh - radius);
+      ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+      ctx.lineTo(rx + radius, ry + rh);
+      ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+      ctx.lineTo(rx, ry + radius);
+      ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Draw Selected Dental Icon into emblem
+      const emblemImg = new Image();
+      emblemImg.src = getSelectedIconUrl();
+      await new Promise(r => { emblemImg.onload = r; });
+      ctx.drawImage(emblemImg, 1200 - 75, emblemY - 75, 150, 150);
+
+      // 4. Titles & Dental Subtitle
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 88px Cairo, sans-serif';
+      ctx.fillText(title, 1200, 700);
+
+      ctx.fillStyle = palette.gradientStart;
+      ctx.font = '600 46px Cairo, sans-serif';
+      ctx.fillText(`🦷  ${subtitle}  ✨`, 1200, 785);
+
+      // Divider line
+      const lineGrad = ctx.createLinearGradient(850, 835, 1550, 835);
+      lineGrad.addColorStop(0, 'rgba(6, 182, 212, 0)');
+      lineGrad.addColorStop(0.5, palette.gradientStart);
+      lineGrad.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      ctx.strokeStyle = lineGrad;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(850, 835);
+      ctx.lineTo(1550, 835);
+      ctx.stroke();
+
+      // 5. Generate and Draw 1350px Dental QR Code
+      const qrCanvasSize = 1350;
+      const hdQrGenerator = new QRCodeStyling({
+        ...createQrOptions(qrCanvasSize),
+        type: "canvas"
+      });
+
+      const rawBlob = await hdQrGenerator.getRawData("png");
+      const qrBlobUrl = URL.createObjectURL(rawBlob);
+      const qrImage = new Image();
+      qrImage.src = qrBlobUrl;
+      await new Promise(r => { qrImage.onload = r; });
+
+      // QR Frame Container
+      const qrBoxX = 1200 - (qrCanvasSize / 2) - 60;
+      const qrBoxY = 940;
+      const qrBoxW = qrCanvasSize + 120;
+      const qrBoxH = qrCanvasSize + 120;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.07)';
+      ctx.shadowBlur = 45;
+      ctx.shadowOffsetY = 18;
+      ctx.fillStyle = '#ffffff';
+      
+      const bRad = 60;
+      ctx.beginPath();
+      ctx.moveTo(qrBoxX + bRad, qrBoxY);
+      ctx.lineTo(qrBoxX + qrBoxW - bRad, qrBoxY);
+      ctx.quadraticCurveTo(qrBoxX + qrBoxW, qrBoxY, qrBoxX + qrBoxW, qrBoxY + bRad);
+      ctx.lineTo(qrBoxX + qrBoxW, qrBoxY + qrBoxH - bRad);
+      ctx.quadraticCurveTo(qrBoxX + qrBoxW, qrBoxY + qrBoxH, qrBoxX + qrBoxW - bRad, qrBoxY + qrBoxH);
+      ctx.lineTo(qrBoxX + bRad, qrBoxY + qrBoxH);
+      ctx.quadraticCurveTo(qrBoxX, qrBoxY + qrBoxH, qrBoxX, qrBoxY + qrBoxH - bRad);
+      ctx.lineTo(qrBoxX, qrBoxY + bRad);
+      ctx.quadraticCurveTo(qrBoxX, qrBoxY, qrBoxX + bRad, qrBoxY);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = '#cffafe';
+      ctx.lineWidth = 8;
+      ctx.stroke();
+      ctx.restore();
+
+      // Draw QR itself
+      ctx.drawImage(qrImage, 1200 - (qrCanvasSize / 2), 940 + 60, qrCanvasSize, qrCanvasSize);
+      URL.revokeObjectURL(qrBlobUrl);
+
+      // 6. Action Call & Instructions
+      const pillY = 2560;
+      ctx.fillStyle = '#ecfeff';
+      const pillW = 1000, pillH = 90, pillX = 1200 - 500;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(pillX, pillY, pillW, pillH, 45) : ctx.rect(pillX, pillY, pillW, pillH);
+      ctx.fill();
+      ctx.strokeStyle = '#a5f3fc';
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.fillStyle = palette.gradientStart;
+      ctx.font = 'bold 42px Cairo, sans-serif';
+      
+      let badgeLabel = "🦷✨ وجّه كاميرا الهاتف نحو الكود للمسح السريع";
+      if (currentQrType === 'wifi') badgeLabel = "🦷📶 اتصال مباشر بشبكة واي فاي صالة انتظار العيادة";
+      else if (currentQrType === 'whatsapp') badgeLabel = "🦷💬 محادثة واتساب فورية لحجز كشف وطوارئ الأسنان";
+      else if (currentQrType === 'vcard') badgeLabel = "🦷🪪 حفظ جهة اتصال طبيب الأسنان في هاتفك";
+
+      ctx.fillText(badgeLabel, 1200, pillY + 58);
+
+      // Wi-Fi Details Box if active
+      if (currentQrType === 'wifi') {
+        const ssid = document.getElementById("inputWifiSsid").value || "Doctor.S_Dental_Clinic";
+        const pass = document.getElementById("inputWifiPassword").value || "";
+        ctx.fillStyle = '#0e7490';
+        ctx.font = 'bold 46px sans-serif';
+        ctx.fillText(`Wi-Fi: ${ssid}   |   Password: ${pass}`, 1200, 2740);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 38px Cairo, sans-serif';
+        ctx.fillText(actionText, 1200, 2820);
+      } else {
+        ctx.fillStyle = '#475569';
+        ctx.font = '500 40px Cairo, sans-serif';
+        ctx.fillText(actionText, 1200, 2760);
+      }
+
+      // 7. Dental Footer Slogan
+      const slogan = document.getElementById("inputSlogan").value.trim();
+      const isSloganVisible = document.getElementById("toggleSlogan").checked;
+
+      if (isSloganVisible && slogan !== "") {
+        ctx.fillStyle = '#0891b2';
+        ctx.font = 'bold 36px Cairo, sans-serif';
+        ctx.fillText(slogan, 1200, 2960);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 32px sans-serif';
+        ctx.fillText("Doctor.S Dental Clinic • https://nurse9sy-cyber.github.io/Doctor.S/", 1200, 3020);
+      } else {
+        // Center brand info gracefully when slogan is removed/deleted
+        ctx.fillStyle = '#0891b2';
+        ctx.font = 'bold 36px Cairo, sans-serif';
+        ctx.fillText("Doctor.S Dental Clinic", 1200, 2975);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 30px sans-serif';
+        ctx.fillText("https://nurse9sy-cyber.github.io/Doctor.S/", 1200, 3030);
+      }
+
+      const link = document.createElement('a');
+      link.download = `dental-clinic-${currentQrType}-poster-300dpi.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("تم تنزيل لوحة عيادة الأسنان بدقة 300DPI بنجاح! 🦷");
+    }
+
+    // Initialize on window load
+    window.addEventListener('DOMContentLoaded', () => {
+      renderQr();
+    });
+  </script>
+</body>
+</html>
