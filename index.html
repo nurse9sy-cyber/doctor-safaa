@@ -70,6 +70,59 @@
       border-radius: 8px;
     }
 
+    /* تأثير تغير ألوان النقطة التفاعلية الذكية دورياً */
+    @keyframes dynamicColorCycle {
+      0% {
+        background-color: #0d9488;
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7), 0 8px 20px -4px rgba(13, 148, 136, 0.5);
+        transform: scale(1);
+      }
+      20% {
+        background-color: #0284c7;
+        box-shadow: 0 0 0 10px rgba(2, 132, 199, 0), 0 8px 20px -4px rgba(2, 132, 199, 0.5);
+        transform: scale(1.08);
+      }
+      40% {
+        background-color: #6366f1;
+        box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7), 0 8px 20px -4px rgba(99, 102, 241, 0.5);
+        transform: scale(1);
+      }
+      60% {
+        background-color: #8b5cf6;
+        box-shadow: 0 0 0 10px rgba(139, 92, 246, 0), 0 8px 20px -4px rgba(139, 92, 246, 0.5);
+        transform: scale(1.08);
+      }
+      80% {
+        background-color: #059669;
+        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7), 0 8px 20px -4px rgba(5, 150, 105, 0.5);
+        transform: scale(1);
+      }
+      100% {
+        background-color: #0d9488;
+        box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7), 0 8px 20px -4px rgba(13, 148, 136, 0.5);
+        transform: scale(1);
+      }
+    }
+
+    .smart-dot-animated {
+      animation: dynamicColorCycle 5s infinite ease-in-out;
+    }
+
+    /* وميض مؤشر الكتابة */
+    @keyframes cursorBlinkAnimation {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .typing-cursor-indicator {
+      display: inline-block;
+      width: 2.5px;
+      height: 14px;
+      background-color: #0d9488;
+      margin-right: 2px;
+      vertical-align: middle;
+      animation: cursorBlinkAnimation 0.65s infinite;
+    }
+
     @media print {
       body {
         background-color: white !important;
@@ -78,7 +131,7 @@
         color: #0f172a !important;
       }
       
-      header, main, footer, .no-print, #doctorAuthModal, #clinicSettingsModal {
+      header, main, footer, .no-print, #doctorAuthModal, #clinicSettingsModal, #clinicBotContainer {
         display: none !important;
       }
 
@@ -633,6 +686,118 @@
     </div>
   </footer>
 
+  <!-- ======================================================= -->
+  <!-- بوت العيادة التفاعلي الذكي (Smart Clinic Bot) -->
+  <!-- بدون أي أيقونات بشر أو روبوتات أو عيون أو أيدي أو علامات + -->
+  <!-- ======================================================= -->
+  <div id="clinicBotContainer" class="fixed bottom-5 left-4 z-50 flex flex-col items-start gap-2 no-print select-none">
+    
+    <!-- فقاعة العبارات التلقائية لجذب الانتباه -->
+    <div id="botCalloutBubble" onclick="toggleClinicBotModal()"
+      class="cursor-pointer bg-white text-slate-800 text-[11px] font-bold px-3 py-1.5 rounded-2xl shadow-xl border border-slate-200/90 transition-all duration-300 transform -translate-y-1 hover:scale-105 flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+      <span id="botCalloutText">السلام عليكم</span>
+    </div>
+
+    <!-- النقطة التفاعلية الذكية متغيرة الألوان تلقائياً وبشكل دوري -->
+    <button id="botTriggerDot" onclick="toggleClinicBotModal()" 
+      class="smart-dot-animated w-12 h-12 rounded-full text-white shadow-2xl flex items-center justify-center text-sm font-black transition-transform duration-300 active:scale-90 cursor-pointer focus:outline-none"
+      title="المساعد الذكي للعيادة">
+      <span class="w-3.5 h-3.5 rounded-full bg-white/90 shadow-inner"></span>
+    </button>
+
+    <!-- نافذة الحوار والأسئلة التفاعلية -->
+    <div id="botChatWindow" class="hidden absolute bottom-16 left-0 w-[310px] sm:w-[350px] bg-white rounded-3xl shadow-2xl border border-slate-200/90 overflow-hidden flex flex-col transition-all duration-300">
+      
+      <!-- ترويسة نافذة البوت -->
+      <div class="bg-gradient-to-r from-clinic-900 via-clinic-800 to-teal-800 text-white p-3.5 flex items-center justify-between border-b border-teal-700/50">
+        <div class="flex items-center gap-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <div>
+            <h4 class="text-xs font-black" id="botHeaderClinicTitle">المساعد الذكي للعيادة</h4>
+            <p class="text-[10px] text-teal-200">إجابات مباشرة ومحدثة فورياً</p>
+          </div>
+        </div>
+        <button onclick="toggleClinicBotModal()" class="text-white/80 hover:text-white p-1 text-xs font-bold cursor-pointer">
+          ✕
+        </button>
+      </div>
+
+      <!-- منطقة عرض الحوار والرد بالكتابة التفاعلية -->
+      <div id="botChatMessages" class="p-3.5 space-y-3 max-h-[220px] overflow-y-auto custom-scrollbar bg-slate-50/70 text-xs">
+        
+        <!-- الترحيب المباشر المطلوب -->
+        <div class="bg-white p-3 rounded-2xl rounded-tr-none border border-slate-200/80 shadow-sm space-y-1">
+          <p class="font-extrabold text-slate-800 text-xs">السلام عليكم،</p>
+          <p class="text-slate-600 text-[11px] leading-relaxed">أهلاً وسهلاً بك في العيادة. تفضل باختيار أي سؤال أدناه وسأجيبك فوراً وفق معلومات الطبيب المعتمدة:</p>
+        </div>
+
+        <!-- صندوق عرض الإجابة بالكتابة التفاعلية الحية -->
+        <div id="botAnswerBox" class="hidden bg-clinic-50/90 p-3 rounded-2xl rounded-tr-none border border-clinic-200 shadow-sm space-y-1">
+          <div class="text-[10px] font-bold text-clinic-800 flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-clinic-600"></span>
+            <span>الإجابة المعتمدة:</span>
+          </div>
+          <div id="botTypingTarget" class="text-slate-800 text-[11px] leading-relaxed font-semibold"></div>
+        </div>
+
+      </div>
+
+      <!-- قائمة الأسئلة التفاعلية التلقائية -->
+      <div class="p-3 bg-white border-t border-slate-100 space-y-1.5">
+        <div class="text-[10px] font-bold text-slate-400 px-1">اختر سؤالاً للإجابة الفورية:</div>
+        <div id="botQuestionsContainer" class="grid grid-cols-1 gap-1 max-h-[160px] overflow-y-auto custom-scrollbar">
+          
+          <button onclick="askBotQuestion('name')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-slate-50 hover:bg-clinic-50 text-slate-700 hover:text-clinic-800 border border-slate-200 hover:border-clinic-300 transition-all cursor-pointer flex items-center justify-between">
+            <span>🔹 ما هو اسم الطبيب وتخصصه؟</span>
+            <span class="text-slate-400 text-[10px]">←</span>
+          </button>
+
+          <button onclick="askBotQuestion('location')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-slate-50 hover:bg-clinic-50 text-slate-700 hover:text-clinic-800 border border-slate-200 hover:border-clinic-300 transition-all cursor-pointer flex items-center justify-between">
+            <span>📍 ما هو موقع العيادة ورقم التواصل؟</span>
+            <span class="text-slate-400 text-[10px]">←</span>
+          </button>
+
+          <button onclick="askBotQuestion('hours')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-slate-50 hover:bg-clinic-50 text-slate-700 hover:text-clinic-800 border border-slate-200 hover:border-clinic-300 transition-all cursor-pointer flex items-center justify-between">
+            <span>⏰ ما هي ساعات وأوقات الدوام؟</span>
+            <span class="text-slate-400 text-[10px]">←</span>
+          </button>
+
+          <button onclick="askBotQuestion('days')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-slate-50 hover:bg-clinic-50 text-slate-700 hover:text-clinic-800 border border-slate-200 hover:border-clinic-300 transition-all cursor-pointer flex items-center justify-between">
+            <span>📅 ما هي أيام الدوام المعتمدة؟</span>
+            <span class="text-slate-400 text-[10px]">←</span>
+          </button>
+
+          <button onclick="askBotQuestion('seats')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-slate-50 hover:bg-clinic-50 text-slate-700 hover:text-clinic-800 border border-slate-200 hover:border-clinic-300 transition-all cursor-pointer flex items-center justify-between">
+            <span>🪑 كم عدد المقاعد الشاغرة لليوم؟</span>
+            <span class="text-slate-400 text-[10px]">←</span>
+          </button>
+
+          <!-- زر يظهر تلقائياً عند قيام الطبيب بإضافة إعلان أو معلومات إضافية -->
+          <button id="botDynamicNoticeBtn" onclick="askBotQuestion('custom_notice')" 
+            class="hidden text-right text-[11px] font-bold p-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 transition-all cursor-pointer flex items-center justify-between">
+            <span>📢 هل توجد تنبيهات أو إعلانات من العيادة؟</span>
+            <span class="text-amber-600 text-[10px]">←</span>
+          </button>
+
+          <button onclick="askBotQuestion('medical_advice')" 
+            class="text-right text-[11px] font-bold p-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 transition-all cursor-pointer flex items-center justify-between">
+            <span>🌿 نصائح ومعلومات طبية لصحة الفم والأسنان</span>
+            <span class="text-teal-600 text-[10px]">←</span>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
   <!-- PRINTABLE OFFICIAL MEDICAL REPORT -->
   <div id="printablePdfReport" class="hidden">
     <div style="border-bottom: 3px solid #0d9488; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
@@ -863,7 +1028,15 @@
           <label class="block font-bold text-slate-700 mb-1">ملاحظات ومواعيد الدوام المخصصة (فترات العمل)</label>
           <textarea id="settingScheduleNotes" rows="2" placeholder="مثال: من الساعة 9:00 صباحاً إلى 3:00 بعد الظهر، ومن الساعة 6:00 مساءً إلى 9:00 ليلاً"
             class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-clinic-500"></textarea>
-          <p class="text-[10px] text-slate-500 mt-1">تظهر هذه المواعيد والتفاصيل فوراً للمريض في شريط الحجز العلوي كأوقات الدوام الرسمية.</p>
+          <p class="text-[10px] text-slate-500 mt-1">تظهر هذه المواعيد والتفاصيل فوراً للمريض في شريط الحجز العلوي كأوقات الدوام الرسمية وتضاف للبوت تلقائياً.</p>
+        </div>
+
+        <!-- Bot Additional Notice or Announcements -->
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">إعلانات أو معلومات إضافية للمرضى (تظهر في البوت الذكي تلقائياً)</label>
+          <textarea id="settingBotCustomNotice" rows="2" placeholder="مثال: نرحب بكم! يوجد خصم 20% على جلسات تنظيف الأسنان هذا الأسبوع، والعيادة تفتح استثنائياً يوم الجمعة للحالات الإسعافية."
+            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-clinic-500"></textarea>
+          <p class="text-[10px] text-slate-500 mt-1">أي معلومة أو إعلان تكتبه هنا يتحول فوراً وبشكل تلقائي إلى سؤال متاح في نافذة البوت الذكي.</p>
         </div>
 
         <!-- Work Days -->
@@ -1003,6 +1176,7 @@
       startHour: "10:30",
       endHour: "20:30",
       scheduleNotes: "",
+      botCustomNotice: "",
       workDays: ["sat", "sun", "mon", "tue", "wed", "thu"],
       maxDailyCapacity: 15,
       slotDuration: 45,
@@ -1110,6 +1284,7 @@
       document.getElementById('navDoctorGenderBadge').textContent = cfg.doctorGender === 'دكتورة' ? 'طبيبة أسنان' : 'طبيب أسنان';
       document.getElementById('bannerDoctorName').textContent = `عيادة ${fullDoctorDisplay} - ${cfg.specialty || "جراحة وزراعة وتجميل الأسنان"}`;
       document.getElementById('footerClinicName').textContent = `عيادة ${fullDoctorDisplay}`;
+      document.getElementById('botHeaderClinicTitle').textContent = `عيادة ${fullDoctorDisplay}`;
 
       const bannerScheduleNotes = document.getElementById('bannerScheduleNotesText');
       if (bannerScheduleNotes) {
@@ -1144,6 +1319,16 @@
         seatsContainer.classList.add('hidden');
       } else {
         seatsContainer.classList.remove('hidden');
+      }
+
+      // إظهار زر الإعلان في البوت إذا أضاف الطبيب إعلاناً
+      const dynamicNoticeBtn = document.getElementById('botDynamicNoticeBtn');
+      if (dynamicNoticeBtn) {
+        if (cfg.botCustomNotice && cfg.botCustomNotice.trim() !== "") {
+          dynamicNoticeBtn.classList.remove('hidden');
+        } else {
+          dynamicNoticeBtn.classList.add('hidden');
+        }
       }
 
       generateTimeSlots(cfg.startHour, cfg.endHour, cfg.slotDuration);
@@ -1773,6 +1958,7 @@
       document.getElementById('settingStartHour').value = clinicConfig.startHour || "10:30";
       document.getElementById('settingEndHour').value = clinicConfig.endHour || "20:30";
       document.getElementById('settingScheduleNotes').value = clinicConfig.scheduleNotes || "";
+      document.getElementById('settingBotCustomNotice').value = clinicConfig.botCustomNotice || "";
       document.getElementById('settingMaxCapacity').value = clinicConfig.maxDailyCapacity || 15;
       document.getElementById('settingSlotDuration').value = clinicConfig.slotDuration || 45;
       document.getElementById('settingAddress').value = clinicConfig.address || "";
@@ -1802,6 +1988,7 @@
         startHour: document.getElementById('settingStartHour').value,
         endHour: document.getElementById('settingEndHour').value,
         scheduleNotes: document.getElementById('settingScheduleNotes').value.trim(),
+        botCustomNotice: document.getElementById('settingBotCustomNotice').value.trim(),
         workDays: selectedDays,
         maxDailyCapacity: Number(document.getElementById('settingMaxCapacity').value) || 15,
         slotDuration: Number(document.getElementById('settingSlotDuration').value) || 45,
@@ -1820,7 +2007,7 @@
         } catch(e) {}
         applySettingsToUI(clinicConfig);
         closeClinicSettingsModal();
-        alert("تم حفظ إعدادات العيادة بنجاح ومزامنتها لحظياً مع كافة أجهزة المرضى!");
+        alert("تم حفظ إعدادات العيادة بنجاح ومزامنتها لحظياً مع كافة أجهزة المرضى والبوت الذكي!");
       } catch (err) {
         alert("فشل حفظ الإعدادات: " + err.message);
       }
@@ -2007,7 +2194,128 @@
     }
 
     // ==========================================
-    // 12. انطلاق التطبيق
+    // 12. منطق البوت التفاعلي الذكي ومؤثر الكتابة للطبيب (ع)
+    // ==========================================
+    const botPhrases = [
+      "السلام عليكم",
+      "تفضل",
+      "هنا",
+      "تفضل بالدخول",
+      "هيا اضغط",
+      "أنا هنا تفضل"
+    ];
+    let botPhraseIndex = 0;
+    let typingTimer = null;
+
+    // تدوير عبارات لفت الانتباه دورياً
+    function cycleBotCallouts() {
+      const el = document.getElementById('botCalloutText');
+      if (!el) return;
+      botPhraseIndex = (botPhraseIndex + 1) % botPhrases.length;
+      el.style.opacity = '0';
+      setTimeout(() => {
+        el.textContent = botPhrases[botPhraseIndex];
+        el.style.opacity = '1';
+      }, 250);
+    }
+    setInterval(cycleBotCallouts, 2800);
+
+    function toggleClinicBotModal() {
+      const windowEl = document.getElementById('botChatWindow');
+      if (windowEl.classList.contains('hidden')) {
+        windowEl.classList.remove('hidden');
+        document.getElementById('botCalloutBubble').classList.add('hidden');
+      } else {
+        windowEl.classList.add('hidden');
+        document.getElementById('botCalloutBubble').classList.remove('hidden');
+      }
+    }
+
+    // كتابة الرد حرفاً بحرف مع وميض المؤشر
+    function typeBotAnswer(text) {
+      const answerBox = document.getElementById('botAnswerBox');
+      const target = document.getElementById('botTypingTarget');
+      const messagesContainer = document.getElementById('botChatMessages');
+
+      if (typingTimer) clearInterval(typingTimer);
+      answerBox.classList.remove('hidden');
+      target.innerHTML = '<span class="typing-cursor-indicator"></span>';
+      
+      let i = 0;
+      typingTimer = setInterval(() => {
+        if (i < text.length) {
+          const currentText = text.substring(0, i + 1).replace(/\n/g, '<br>');
+          target.innerHTML = currentText + '<span class="typing-cursor-indicator"></span>';
+          i++;
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        } else {
+          clearInterval(typingTimer);
+          target.innerHTML = text.replace(/\n/g, '<br>');
+          messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+      }, 20);
+    }
+
+    function askBotQuestion(topic) {
+      const docName = clinicConfig.doctorName ? `${clinicConfig.doctorGender} ${clinicConfig.doctorName}` : "الطبيب المعتمد";
+      const daysText = (clinicConfig.workDays || []).map(d => dayNamesAr[d]).join('، ') || "السبت إلى الخميس";
+      const bookedSeats = todayAppointments.reduce((sum, item) => sum + (Number(item.partySize) || 1), 0);
+      const maxCap = Number(clinicConfig.maxDailyCapacity) || 15;
+      const seatsLeft = Math.max(0, maxCap - bookedSeats);
+
+      let responseText = "";
+
+      switch (topic) {
+        case 'name':
+          responseText = `طبيب العيادة المشرف:\n${docName}\nالتخصص: ${clinicConfig.specialty || "طب وجراحة وتجميل الأسنان"}.`;
+          break;
+
+        case 'location':
+          const loc = clinicConfig.address || "المقر المعتمد للعيادة";
+          const ph = clinicConfig.phone || "غير محدد حالياً";
+          responseText = `موقع العيادة المعتمد:\n📍 ${loc}\n📞 هاتف الاستقبال والتواصل: ${ph}`;
+          break;
+
+        case 'hours':
+          const notes = clinicConfig.scheduleNotes ? `\n\nتفاصيل الفترات والدوام:\n${clinicConfig.scheduleNotes}` : '';
+          responseText = `ساعات الدوام المعتمدة:\n⏰ من الساعة ${clinicConfig.startHour || "10:30"} حتى ${clinicConfig.endHour || "20:30"}${notes}`;
+          break;
+
+        case 'days':
+          responseText = `أيام العمل واستقبال المراجعين أسبوعياً هي:\n📅 ${daysText}`;
+          break;
+
+        case 'seats':
+          if (clinicConfig.clinicManuallyClosed) {
+            responseText = `⚠️ الحجز متوقف مؤقتاً لليوم بقرار مباشر من إدارة العيادة.`;
+          } else if (seatsLeft <= 0) {
+            responseText = `⚠️ اكتملت كافة حجوزات ومقاعد اليوم (${maxCap} مقعداً). نعتذر منك، ويمكنك حجز موعد في أيام الدوام القادمة.`;
+          } else {
+            responseText = `المقاعد المتبقية والمتاحة للحجز اليوم هي: (${seatsLeft}) مقعداً من أصل (${maxCap}) مقعد مخصص لليوم.`;
+          }
+          break;
+
+        case 'custom_notice':
+          responseText = `📢 تنبيه وإعلان من إدارة العيادة:\n${clinicConfig.botCustomNotice || "لا توجد تنبيهات إضافية حالياً."}`;
+          break;
+
+        case 'medical_advice':
+          const tips = [
+            "🌿 السواك سُنّة نبوية ومطهرة للفم: يحتوي السواك الطبيعي على ألياف ناعمة ومواد فعالة مطهرة تمنع ترسب الجير وتساعد في محاربة التهاب اللثة ورائحة الفم.",
+            "🦷 التنظيف السليم: نظف أسنانك بفرشاة ناعمة مرتين يومياً، وبشكل خاص قبل النوم، بحركات دائرية لطيفة من اللثة باتجاه حافة السن.",
+            "🧵 خيط الأسنان الطبي: استخدامه يومياً يزيل بقايا الطعام العالقة بين الأسنان التي لا تستطيع الفرشاة الوصول إليها، وهو خط الدفاع الأول ضد تسوس الجذور.",
+            "💧 جفاف الفم وشرب الماء: شرب كميات كافية من الماء يحفز إفراز اللعاب الذي يُعد الحامي الطبيعي للميناء من الأحماض والبكتيريا.",
+            "🩹 إسعاف ألم الأسنان المفاجئ: عند حدوث ألم طارئ، يُفضل المضمضة بماء دافئ مع القليل من الملح، وتجنب وضع الأسبرين مباشرة على اللثة لتفادي حرق الأنسجة."
+          ];
+          responseText = tips.join('\n\n');
+          break;
+      }
+
+      typeBotAnswer(responseText);
+    }
+
+    // ==========================================
+    // 13. انطلاق التطبيق
     // ==========================================
     window.addEventListener('DOMContentLoaded', () => {
       listenToClinicSettingsRealtime();
